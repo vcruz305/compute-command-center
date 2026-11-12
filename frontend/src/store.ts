@@ -53,11 +53,22 @@ const save = (k: string, v: string) => { try { localStorage.setItem(k, v) } catc
 function defaultPositions(devices: Device[], existing: Positions): Positions {
   const out = { ...existing }
   const n = devices.length
+  // Portrait phones use a 2-row formation (spreads devices down the tall
+  // screen); desktop uses a ring around the command core.
+  const mobile = typeof window !== 'undefined' && window.innerWidth < 640
   devices.forEach((d, i) => {
     if (!out[d.id]) {
-      const angle = (i / Math.max(n, 1)) * Math.PI * 2 - Math.PI / 2
-      const radius = n <= 1 ? 0 : 8.5
-      out[d.id] = [Math.cos(angle) * radius, Math.sin(angle) * radius]
+      if (mobile && n > 1) {
+        const cols = Math.min(2, n)
+        const rows = Math.ceil(n / cols)
+        const row = Math.floor(i / cols), col = i % cols
+        const inRow = Math.min(cols, n - row * cols)
+        out[d.id] = [(col - (inRow - 1) / 2) * 9.5, (row - (rows - 1) / 2) * 7.0]
+      } else {
+        const angle = (i / Math.max(n, 1)) * Math.PI * 2 - Math.PI / 2
+        const radius = n <= 1 ? 0 : 8.5
+        out[d.id] = [Math.cos(angle) * radius, Math.sin(angle) * radius]
+      }
     }
   })
   return out

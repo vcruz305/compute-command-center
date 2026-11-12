@@ -13,15 +13,23 @@
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body, #root { height: 100%; width: 100%; overflow: hidden; }
+html { overscroll-behavior: none; }
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--body);
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.app { position: relative; height: 100vh; width: 100vw; }
-.scene-wrap { position: absolute; inset: 0; width: 100%; height: 100%; }
-canvas { display: block; }
+.app { position: relative; height: 100vh; height: 100dvh; width: 100vw; }
+.scene-wrap {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  touch-action: none;              /* let OrbitControls own all gestures */
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+canvas { display: block; touch-action: none; }
+button { touch-action: manipulation; }
 
 /* subtle CRT scanlines */
 .scanlines {
@@ -181,8 +189,128 @@ canvas { display: block; }
 ::-webkit-scrollbar-thumb { background: rgba(34,211,238,.3); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(34,211,238,.5); }
 
+/* short labels + touch hint are hidden on desktop by default */
+.tb-short { display: none; }
+.hint-touch { display: none; }
+
+/* ---------- Tablet / narrow desktop ---------- */
 @media (max-width: 900px) {
-  .fleet-stats { gap: 12px; }
+  .fleetbar { gap: 14px; padding: 10px 14px; }
+  .fleet-stats { gap: 14px; }
+  .fleet-stat-value { font-size: 13px; }
+  .device-panel { width: 290px; }
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 640px) {
+  .fleetbar {
+    flex-wrap: wrap; gap: 6px 12px;
+    padding: calc(8px + env(safe-area-inset-top)) 12px 8px;
+  }
+  .fleet-brand { order: 1; flex: 1; min-width: 0; gap: 8px; }
+  .fleet-logo { font-size: 20px; }
+  .fleet-title { font-size: 14px; letter-spacing: 2px; }
+  .fleet-sub { font-size: 7px; letter-spacing: 1.5px; }
+  .fleet-mode { order: 2; gap: 6px; }
+  .mode-badge, .conn-badge { font-size: 10px; padding: 4px 8px; }
+  .fleet-stats {
+    order: 3; flex-basis: 100%; flex-wrap: nowrap; overflow-x: auto;
+    gap: 14px; padding: 2px 2px 6px; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    mask-image: linear-gradient(90deg, #000 86%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent);
+  }
+  .fleet-stats::-webkit-scrollbar { display: none; }
+  .fleet-stat { flex-shrink: 0; }
   .fleet-stat-value { font-size: 12px; }
-  .device-panel { width: 280px; }
+
+  .demo-banner {
+    top: calc(90px + env(safe-area-inset-top)); font-size: 8px; letter-spacing: 1px;
+    padding: 4px 10px; max-width: 92vw; text-align: center;
+  }
+
+  /* HUDs: fixed-size name tags (full metrics live in the tap-through sheet) */
+  .hud { width: 150px; padding: 6px 8px; }
+  .hud-compact { width: auto; max-width: 120px; padding: 4px 8px; }
+  .hud-compact .hud-head { margin-bottom: 0; gap: 5px; }
+  .hud-compact .hud-name { font-size: 11px; max-width: 60px; }
+  .hud-compact .hud-sim { margin-left: 4px; }
+  .hud-tag-gpu { font-family: var(--mono); font-size: 10px; color: var(--hud-color); margin-left: auto; }
+  .hud-compact .hud-tail { bottom: -12px; height: 12px; }
+  .hud-val { font-size: 10px; }
+  .hud-label { font-size: 6px; }
+
+  /* Device panel -> bottom sheet */
+  .device-panel {
+    top: auto; left: 10px; right: 10px;
+    bottom: calc(66px + env(safe-area-inset-bottom));
+    width: auto; max-height: 54vh; border-radius: 14px;
+    animation: sheetup .28s cubic-bezier(.2,.8,.2,1);
+  }
+  .dp-head { padding: 12px 14px 8px; }
+  .dp-title { font-size: 15px; }
+  .dp-close { width: 34px; height: 34px; font-size: 15px; }
+  .dp-scroll { padding: 6px 14px 14px; }
+  .dp-row { font-size: 12px; padding: 4px 0; }
+
+  /* Toolbar: single compact row of touch-sized buttons */
+  .toolbar {
+    left: 10px; right: 10px; transform: none; width: auto;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    flex-direction: row; flex-wrap: nowrap; justify-content: center; gap: 8px;
+  }
+  .toolbar-group { gap: 8px; }
+  .tb-btn { padding: 10px 12px; font-size: 13px; min-height: 44px; }
+  .tb-full { display: none; }
+  .tb-short { display: inline; }
+  .hint-desktop, .hint-touch { display: none; }
+
+  /* Modals -> bottom sheets; 16px inputs prevent iOS focus-zoom */
+  .modal-backdrop { align-items: flex-end; padding: 0; }
+  .modal, .modal-wide {
+    width: 100%; max-width: 100%; max-height: 88vh;
+    border-radius: 18px 18px 0 0;
+    padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
+    animation: sheetup .28s cubic-bezier(.2,.8,.2,1);
+  }
+  .modal-input { font-size: 16px; padding: 10px 12px; }
+  .modal-grid { grid-template-columns: 1fr; }
+  .modal-actions .tb-btn { flex: 1; min-height: 46px; }
+  .ts-node { padding: 8px 10px; font-size: 13px; }
+}
+
+@keyframes sheetup { from { transform: translateY(46px); opacity: 0 } to { transform: none; opacity: 1 } }
+
+/* ---------- Small phones ---------- */
+@media (max-width: 400px) {
+  .fleet-title { font-size: 13px; }
+  .tb-btn { padding: 10px 8px; font-size: 12px; }
+  .toolbar { gap: 6px; }
+  .toolbar-group { gap: 6px; }
+  .hud { width: 132px; }
+  .device-panel { max-height: 52vh; }
+}
+
+/* ---------- Touch devices: suppress hover-only effects ---------- */
+@media (pointer: coarse) {
+  .hud:hover { transform: none; box-shadow: 0 0 18px rgba(34,211,238,.18); }
+  .tb-btn:hover { box-shadow: none; }
+  .ts-node:hover { border-color: var(--line); }
+}
+@media (pointer: coarse) and (min-width: 641px) {
+  .hint-desktop { display: none; }
+  .hint-touch { display: block; }
+}
+
+/* ---------- Landscape phones ---------- */
+@media (max-height: 480px) and (orientation: landscape) {
+  .fleetbar { padding: 6px 12px; }
+  .fleet-stats { gap: 12px; }
+  .device-panel {
+    top: 54px; bottom: 60px; left: auto; right: 10px;
+    width: 300px; max-height: none; border-radius: 8px; animation: slidein .25s ease;
+  }
+  .toolbar { bottom: 8px; }
+  .toolbar-hint { display: none; }
+  .demo-banner { top: 48px; }
 }

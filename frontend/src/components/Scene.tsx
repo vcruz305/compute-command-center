@@ -68,9 +68,9 @@ function Connection({ from, to, color, active }: {
   )
 }
 
-function DeviceNode({ device, dragId, setDragId, controls }: {
+function DeviceNode({ device, dragId, setDragId, controls, index }: {
   device: Device; dragId: string | null
-  setDragId: (id: string | null) => void; controls: React.MutableRefObject<any>
+  setDragId: (id: string | null) => void; controls: React.MutableRefObject<any>; index: number
 }) {
   const positions = useStore(s => s.positions)
   const selectedId = useStore(s => s.selectedId)
@@ -97,7 +97,7 @@ function DeviceNode({ device, dragId, setDragId, controls }: {
       onPointerOut={() => { document.body.style.cursor = 'auto' }}
     >
       <DeviceModel device={device} selected={selected} hovered={false} />
-      <DeviceHUD device={device} selected={selected} onSelect={() => select(device.id)} />
+      <DeviceHUD device={device} selected={selected} onSelect={() => select(device.id)} lift={0} />
     </group>
   )
 }
@@ -132,6 +132,7 @@ function SceneContent() {
   const selectedId = useStore(s => s.selectedId)
   const [dragId, setDragId] = useState<string | null>(null)
   const controls = useRef<any>(null)
+  const { size } = useThree()
 
   useEffect(() => {
     const up = () => {
@@ -150,7 +151,7 @@ function SceneContent() {
       <fog attach="fog" args={['#02040a', 30, 70]} />
       <ambientLight intensity={0.3} />
       <pointLight position={[10, 15, 10]} intensity={1.2} color="#3b82f6" />
-      <Stars radius={80} depth={40} count={2500} factor={3} saturation={0} fade speed={0.5} />
+      <Stars radius={80} depth={40} count={size.width < 700 ? 1300 : 2500} factor={3} saturation={0} fade speed={0.5} />
       <Grid
         position={[0, 0, 0]}
         args={[80, 80]}
@@ -179,8 +180,8 @@ function SceneContent() {
           />
         )
       })}
-      {devices.map(d => (
-        <DeviceNode key={d.id} device={d} dragId={dragId} setDragId={setDragId} controls={controls} />
+      {devices.map((d, i) => (
+        <DeviceNode key={d.id} device={d} dragId={dragId} setDragId={setDragId} controls={controls} index={i} />
       ))}
       <DragPlane dragId={dragId} setDragId={setDragId} controls={controls} />
       <OrbitControls
@@ -188,7 +189,7 @@ function SceneContent() {
         enableDamping
         dampingFactor={0.08}
         minDistance={5}
-        maxDistance={45}
+        maxDistance={size.width < 700 ? 80 : 45}
         maxPolarAngle={Math.PI / 2.05}
         target={[0, 1, 0]}
       />
@@ -203,18 +204,29 @@ function SceneContent() {
 export function Scene() {
   // Give the canvas container explicit pixel dimensions so R3F measures a real
   // size on mount (its resize observer can miss the initial layout in some
-  // environments). Track window resizes ourselves.
+  // environments). Track window resizes / orientation changes ourselves.
   const [size, setSize] = useState({ w: window.innerWidth, h: window.innerHeight })
   useEffect(() => {
     const full = () => setSize({ w: window.innerWidth, h: window.innerHeight })
     window.addEventListener('resize', full)
-    return () => window.removeEventListener('resize', full)
+    window.addEventListener('orientationchange', full)
+    return () => { window.removeEventListener('resize', full); window.removeEventListener('orientationchange', full) }
   }, [])
+  const aspect = size.w / Math.max(size.h, 1)
+  const portrait = aspect < 0.85
+  const coarse = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+  const small = size.w < 700
+  // Pull the camera back and widen FOV on portrait phones so the whole fleet
+  // ring stays in frame; cap pixel ratio on touch/small screens for fluid orbit.
+  const camera = useMemo(() => portrait
+    ? { position: [0, 26, 48] as [number, number, number], fov: 60 }
+    : { position: [0, 14, 20] as [number, number, number], fov: 50 }, [portrait])
+  const dprMax = coarse || small ? 1.5 : 1.75
   return (
     <div className="scene-wrap" style={{ width: size.w, height: size.h }}>
       <Canvas
-        camera={{ position: [0, 14, 20], fov: 50 }}
-        dpr={[1, 1.75]}
+        camera={camera}
+        dpr={[1, dprMax]}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
         onPointerMissed={() => useStore.getState().select(null)}
       >

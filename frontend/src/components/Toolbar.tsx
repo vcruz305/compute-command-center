@@ -12,24 +12,25 @@ export function Toolbar() {
     <div className="toolbar">
       <div className="toolbar-group">
         <button className={`tb-btn ${mode === 'demo' ? 'tb-active' : ''}`} onClick={() => setMode('demo')} title="Simulated fleet">
-          ◐ Demo
+          ◐<span className="tb-label"> Demo</span>
         </button>
         <button className={`tb-btn ${mode === 'live' ? 'tb-active' : ''}`} onClick={() => setMode('live')} title="Real devices via backend">
-          ● Live
+          ●<span className="tb-label"> Live</span>
         </button>
       </div>
       <div className="toolbar-group">
         <button className="tb-btn" onClick={() => setShowConnect(true)} title="Connect to a telemetry backend">
-          ⌁ Backend{conn === 'connected' ? ' ✓' : ''}
+          ⌁<span className="tb-label"> Backend</span>{conn === 'connected' ? ' ✓' : ''}
         </button>
         <button className="tb-btn" onClick={() => setShowAdd(true)} title="Add a device (requires backend)">
-          ＋ Add Device
+          ＋<span className="tb-label tb-full"> Add Device</span><span className="tb-label tb-short"> Add</span>
         </button>
       </div>
-      <div className="toolbar-hint">
+      <div className="toolbar-hint hint-desktop">
         drag to move · scroll to zoom · click for detail
         {mode === 'live' && !backendUrl && <span className="tb-warn"> · set a backend URL</span>}
       </div>
+      <div className="toolbar-hint hint-touch">tap a device · pinch to zoom · drag to move</div>
     </div>
   )
 }
