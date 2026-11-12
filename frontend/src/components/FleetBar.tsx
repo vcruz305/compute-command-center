@@ -31,7 +31,7 @@ export function FleetBar() {
         </div>
       </div>
       <div className="fleet-stats">
-        <Stat label="DEVICES" value={`${fmtInt(a?.online_devices)}/${fmtInt(a?.total_devices)}`} accent="#22d3ee" />
+        <Stat label="DEVICES" value={a ? `${fmtInt(a.online_devices)}/${fmtInt(a.total_devices)}` : '0/0'} accent="#22d3ee" />
         <Stat label="GPUs" value={fmtInt(a?.total_gpus)} />
         <Stat label="VRAM" value={a?.used_vram_mb != null && a?.total_vram_mb ? `${fmtBytesMB(a.used_vram_mb)} / ${fmtBytesMB(a.total_vram_mb)}` : 'N/A'} />
         <Stat label="THROUGHPUT" value={fmt(a?.aggregate_throughput_tps, ' tok/s', 0)} accent="#fbbf24" />
