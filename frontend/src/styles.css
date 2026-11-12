@@ -104,7 +104,7 @@ button { touch-action: manipulation; }
 /* Per-node engine API endpoint */
 .hud-endpoint { display: flex; align-items: center; gap: 4px; margin: 0 0 5px; font-family: var(--mono); min-width: 0; }
 .hud-ep-ico { color: var(--hud-color); font-size: 10px; flex-shrink: 0; line-height: 1; }
-.hud-ep-url { font-size: 9px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hud-ep-url { font-size: 9.5px; color: #9fc6d4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ---------- Network core (center hub readout) ---------- */
 .net-core {
