@@ -44,7 +44,7 @@ function exportScreenshot() {
     const url = canvas.toDataURL('image/png')
     const a = document.createElement('a')
     a.href = url
-    a.download = `orbital-fleet-${Date.now()}.png`
+    a.download = `constellation-fleet-${Date.now()}.png`
     document.body.appendChild(a)
     a.click()
     a.remove()

@@ -24,9 +24,9 @@ export function FleetBar() {
   return (
     <header className="fleetbar">
       <div className="fleet-brand">
-        <div className="fleet-logo">◈</div>
+        <div className="fleet-logo">✦</div>
         <div>
-          <div className="fleet-title">ORBITAL</div>
+          <div className="fleet-title">CONSTELLATION</div>
           <div className="fleet-sub">AI COMPUTE COMMAND</div>
         </div>
       </div>

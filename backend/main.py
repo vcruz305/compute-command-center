@@ -1,4 +1,4 @@
-"""ORBITAL Command Center backend — FastAPI + WebSocket live telemetry.
+"""CONSTELLATION Command Center backend — FastAPI + WebSocket live telemetry.
 Streams REAL device metrics collected over SSH/Tailscale. Demo mode is separate
 and clearly labeled. Credentials stay server-side.
 """
@@ -79,7 +79,7 @@ async def lifespan(app):
     yield
     task.cancel()
 
-app = FastAPI(title="ORBITAL Command Center", lifespan=lifespan)
+app = FastAPI(title="CONSTELLATION Command Center", lifespan=lifespan)
 # allow_private_network: the GitHub Pages (public) origin reaches this backend
 # over a private tailnet IP; Chrome's Private Network Access requires opt-in.
 app.add_middleware(
@@ -92,7 +92,7 @@ app.add_middleware(
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "service": "orbital-command-center", "mode": STATE["mode"],
+    return {"ok": True, "service": "constellation", "mode": STATE["mode"],
             "interval_s": INTERVAL, "devices": len(STATE["fleet"]["devices"]), "ts": STATE["ts"]}
 
 @app.get("/api/fleet")

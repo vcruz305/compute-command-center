@@ -1,10 +1,12 @@
-# ORBITAL // AI Compute Command Center
+# CONSTELLATION // AI Compute Command Center
+
+*Every device a star — linked into one constellation.*
 
 A futuristic, TRON-inspired **3D observability dashboard** for GPU infrastructure. Real
 devices are collected over SSH/Tailscale and streamed live into holographic machine models
 with floating HUDs, an aggregated fleet dashboard, and per-device charts.
 
-**Live demo:** https://vcruz305.github.io/compute-command-center/
+**Live demo:** https://vcruz305.github.io/constellation/
 **Full app (owner's tailnet):** `https://hermes-vps.tailda7808.ts.net`
 
 ---

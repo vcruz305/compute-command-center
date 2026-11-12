@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ORBITAL-C3 remote probe. Runs ON the target device (via `ssh host python3 -`).
+"""CONSTELLATION remote probe. Runs ON the target device (via `ssh host python3 -`).
 Emits a single JSON object of REAL measurements. Anything unavailable is null.
 Never fabricates values. Designed to finish in ~3-4s. Works on Linux + macOS.
 """
@@ -210,7 +210,7 @@ out["gpu_processes"] = gpu_procs
 import urllib.request
 def http_get(url, timeout=1.5):
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "orbital-c3-probe"})
+        req = urllib.request.Request(url, headers={"User-Agent": "constellation-probe"})
         with urllib.request.urlopen(req, timeout=timeout) as r:
             return r.read(200000).decode("utf-8", "replace")
     except Exception:
