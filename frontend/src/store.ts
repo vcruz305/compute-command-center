@@ -4,6 +4,26 @@ import { demoFrame } from './demo'
 
 export type Mode = 'demo' | 'live'
 export type Conn = 'disconnected' | 'connecting' | 'connected' | 'error'
+export type Quality = 'low' | 'med' | 'high'
+
+export interface Viz {
+  bloom: number
+  quality: Quality
+  hologram: boolean
+  grid: boolean
+  autoOrbit: boolean
+  orbitSpeed: number
+  flowSpeed: number
+  particles: number
+  links: boolean
+  theme: string
+}
+
+export const DEFAULT_VIZ: Viz = {
+  bloom: 1.15, quality: 'high', hologram: false, grid: true,
+  autoOrbit: true, orbitSpeed: 0.5, flowSpeed: 1.0, particles: 0.55,
+  links: true, theme: 'cyan',
+}
 
 interface Positions { [id: string]: [number, number] }
 
@@ -20,6 +40,9 @@ interface State {
   showAdd: boolean
   showConnect: boolean
   followSelected: boolean
+  viz: Viz
+  sound: boolean
+  resetCamNonce: number
   // actions
   setMode: (m: Mode) => void
   connect: (url: string) => void
@@ -29,6 +52,10 @@ interface State {
   setShowAdd: (v: boolean) => void
   setShowConnect: (v: boolean) => void
   setFollow: (v: boolean) => void
+  setViz: (patch: Partial<Viz>) => void
+  setSound: (v: boolean) => void
+  resetCamera: () => void
+  shuffleLayout: () => void
   applyFrame: (devices: Device[], aggregate: Aggregate | null, ts: number, mode: Mode) => void
 }
 
@@ -49,6 +76,14 @@ const load = (k: string, fallback: string) => {
   try { return localStorage.getItem(k) ?? fallback } catch { return fallback }
 }
 const save = (k: string, v: string) => { try { localStorage.setItem(k, v) } catch {} }
+
+function loadViz(): Viz {
+  try {
+    const raw = localStorage.getItem('occ.viz')
+    if (!raw) return { ...DEFAULT_VIZ }
+    return { ...DEFAULT_VIZ, ...JSON.parse(raw) }
+  } catch { return { ...DEFAULT_VIZ } }
+}
 
 function defaultPositions(devices: Device[], existing: Positions): Positions {
   const out = { ...existing }
@@ -87,6 +122,9 @@ export const useStore = create<State>((set, get) => ({
   showAdd: false,
   showConnect: false,
   followSelected: false,
+  viz: loadViz(),
+  sound: load('occ.sound', '1') === '1',
+  resetCamNonce: 0,
 
   applyFrame: (devices, aggregate, ts, mode) => {
     const positions = defaultPositions(devices, get().positions)
@@ -155,6 +193,29 @@ export const useStore = create<State>((set, get) => ({
   setShowAdd: (v) => set({ showAdd: v }),
   setShowConnect: (v) => set({ showConnect: v }),
   setFollow: (v) => set({ followSelected: v }),
+  setViz: (patch) => {
+    const viz = { ...get().viz, ...patch }
+    save('occ.viz', JSON.stringify(viz))
+    set({ viz })
+  },
+  setSound: (v) => { save('occ.sound', v ? '1' : '0'); set({ sound: v }) },
+  resetCamera: () => set({ resetCamNonce: get().resetCamNonce + 1 }),
+  shuffleLayout: () => {
+    const devices = get().devices
+    const mobile = typeof window !== 'undefined' && window.innerWidth < 640
+    const positions: Positions = {}
+    devices.forEach(d => {
+      if (mobile) {
+        positions[d.id] = [(Math.random() - 0.5) * 11, (Math.random() - 0.5) * 15]
+      } else {
+        const a = Math.random() * Math.PI * 2
+        const r = 6 + Math.random() * 5.5
+        positions[d.id] = [Math.cos(a) * r, Math.sin(a) * r]
+      }
+    })
+    save('occ.positions', JSON.stringify(positions))
+    set({ positions })
+  },
 }))
 
 function startDemo(set: any, get: any) {

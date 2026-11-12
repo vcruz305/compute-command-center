@@ -104,7 +104,7 @@ button { touch-action: manipulation; }
 /* ---------- Device panel ---------- */
 .device-panel {
   --hud-color: var(--cyan);
-  position: absolute; top: 70px; right: 16px; bottom: 90px; width: 320px; z-index: 25;
+  position: absolute; top: 70px; right: 16px; bottom: calc(140px + env(safe-area-inset-bottom)); width: 320px; z-index: 25;
   background: var(--panel); border: 1px solid var(--hud-color); border-radius: 6px;
   backdrop-filter: blur(10px);
   box-shadow: 0 0 30px rgba(34,211,238,.15);
@@ -189,6 +189,90 @@ button { touch-action: manipulation; }
 ::-webkit-scrollbar-thumb { background: rgba(34,211,238,.3); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(34,211,238,.5); }
 
+/* ---------- Theme accents ---------- */
+.app[data-theme="ember"] { --cyan:#fbbf24; --blue:#f97316; --line:rgba(251,191,36,.25); }
+.app[data-theme="aurora"] { --cyan:#4ade80; --blue:#22d3ee; --line:rgba(74,222,128,.25); }
+.app[data-theme="violet"] { --cyan:#a78bfa; --blue:#ec4899; --line:rgba(167,139,250,.28); }
+
+/* ---------- Sound toggle ---------- */
+.sound-btn {
+  width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+  background:var(--panel); border:1px solid var(--line); border-radius:4px;
+  color:var(--dim); font-size:15px; cursor:pointer; transition:all .15s; line-height:1;
+}
+.sound-btn.on { color:var(--cyan); border-color:var(--cyan); box-shadow:0 0 10px rgba(34,211,238,.2); }
+.sound-btn:hover { border-color:var(--cyan); }
+
+/* ---------- Control deck (base = bottom strip) ---------- */
+.control-deck {
+  position:absolute; z-index:24; left:10px; right:10px;
+  bottom:calc(64px + env(safe-area-inset-bottom));
+  background:var(--panel); border:1px solid var(--line); border-radius:10px;
+  backdrop-filter:blur(10px); box-shadow:0 0 24px rgba(0,0,0,.45);
+  display:flex; flex-direction:column;
+}
+.cd-head {
+  display:none; align-items:center; gap:8px;
+  font-family:var(--disp); font-size:11px; letter-spacing:2px; color:var(--cyan);
+  padding:12px 14px 8px; border-bottom:1px solid var(--line);
+}
+.cd-head-dot { width:7px; height:7px; border-radius:50%; background:var(--cyan); box-shadow:0 0 8px var(--cyan); animation:pulse 2.4s infinite; }
+.cd-body { display:flex; flex-direction:row; align-items:stretch; gap:8px; overflow-x:auto; overflow-y:hidden; padding:8px 10px; }
+.cd-section {
+  flex:0 0 auto; display:flex; align-items:center; justify-content:center;
+  writing-mode:vertical-rl; text-orientation:mixed;
+  font-family:var(--mono); font-size:8px; letter-spacing:2px; color:var(--dim);
+  text-transform:uppercase; padding:0 2px; border-left:1px solid var(--line);
+}
+.cd-item { flex:0 0 auto; width:122px; display:flex; flex-direction:column; justify-content:center; gap:5px;
+  background:rgba(2,8,14,.5); border:1px solid var(--line); border-radius:6px; padding:7px 9px; }
+.cd-item-top { display:flex; justify-content:space-between; align-items:center; }
+.cd-label { font-family:var(--mono); font-size:9px; letter-spacing:1px; color:var(--dim); text-transform:uppercase; white-space:nowrap; }
+.cd-value { font-family:var(--mono); font-size:10px; color:var(--cyan); }
+
+/* range sliders */
+.cd-slider input[type="range"] { -webkit-appearance:none; appearance:none; width:100%; height:16px; background:transparent; cursor:pointer; }
+.cd-slider input[type="range"]::-webkit-slider-runnable-track { height:4px; border-radius:2px; background:linear-gradient(90deg, var(--cyan), var(--blue)); opacity:.85; }
+.cd-slider input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid var(--cyan); margin-top:-5px; box-shadow:0 0 8px var(--cyan); }
+.cd-slider input[type="range"]::-moz-range-track { height:4px; border-radius:2px; background:linear-gradient(90deg, var(--cyan), var(--blue)); }
+.cd-slider input[type="range"]::-moz-range-thumb { width:12px; height:12px; border-radius:50%; background:#fff; border:2px solid var(--cyan); box-shadow:0 0 8px var(--cyan); }
+
+/* toggle */
+.cd-toggle { flex-direction:row; align-items:center; justify-content:space-between; cursor:pointer; text-align:left; }
+.cd-toggle .cd-label { color:var(--text); }
+.cd-switch { width:30px; height:16px; border-radius:9px; background:rgba(2,8,14,.9); border:1px solid var(--line); position:relative; transition:all .15s; flex-shrink:0; }
+.cd-knob { position:absolute; top:1px; left:1px; width:12px; height:12px; border-radius:50%; background:var(--dim); transition:all .15s; }
+.cd-toggle.on { border-color:var(--cyan); }
+.cd-toggle.on .cd-switch { background:rgba(34,211,238,.2); border-color:var(--cyan); }
+.cd-toggle.on .cd-knob { left:15px; background:var(--cyan); box-shadow:0 0 8px var(--cyan); }
+
+/* select */
+.cd-select select { width:100%; background:rgba(2,8,14,.9); border:1px solid var(--line); color:var(--text); font-family:var(--body); font-size:12px; padding:4px 6px; border-radius:4px; cursor:pointer; }
+.cd-select select:focus { outline:none; border-color:var(--cyan); }
+
+/* theme swatches */
+.cd-swatches { display:flex; gap:6px; }
+.cd-swatch { width:20px; height:20px; border-radius:50%; border:2px solid transparent; cursor:pointer; transition:all .15s; }
+.cd-swatch.active { border-color:#fff; box-shadow:0 0 10px currentColor; transform:scale(1.1); }
+
+/* action buttons */
+.cd-actions { flex-direction:row; flex-wrap:wrap; gap:5px; width:auto; }
+.cd-actions button, .cd-reset button {
+  font-family:var(--body); font-weight:600; font-size:11px; color:var(--text);
+  background:rgba(2,8,14,.7); border:1px solid var(--line); border-radius:4px;
+  padding:5px 8px; cursor:pointer; transition:all .15s; white-space:nowrap;
+}
+.cd-actions button:hover, .cd-reset button:hover { border-color:var(--cyan); color:var(--cyan); }
+.cd-reset { width:auto; }
+.cd-reset button { width:100%; color:var(--dim); }
+
+/* deck + panel scrollbars in the artifact's own language */
+.cd-body::-webkit-scrollbar { height:6px; width:6px; }
+.cd-body::-webkit-scrollbar-track { background:rgba(2,8,14,.5); border-radius:3px; }
+.cd-body::-webkit-scrollbar-thumb { background:var(--line); border-radius:3px; }
+.cd-body::-webkit-scrollbar-thumb:hover { background:var(--cyan); }
+.cd-body, .dp-scroll, .modal { scrollbar-width:thin; scrollbar-color:var(--line) rgba(2,8,14,.5); }
+
 /* short labels + touch hint are hidden on desktop by default */
 .tb-short { display: none; }
 .hint-touch { display: none; }
@@ -239,8 +323,8 @@ button { touch-action: manipulation; }
   /* Device panel -> bottom sheet */
   .device-panel {
     top: auto; left: 10px; right: 10px;
-    bottom: calc(66px + env(safe-area-inset-bottom));
-    width: auto; max-height: 54vh; border-radius: 14px;
+    bottom: calc(138px + env(safe-area-inset-bottom));
+    width: auto; max-height: 44vh; border-radius: 14px;
     animation: sheetup .28s cubic-bezier(.2,.8,.2,1);
   }
   .dp-head { padding: 12px 14px 8px; }
@@ -298,15 +382,30 @@ button { touch-action: manipulation; }
   .hint-touch { display: block; }
 }
 
-/* ---------- Landscape phones ---------- */
+/* ---------- Landscape phones: deck becomes a compact left rail ---------- */
 @media (max-height: 480px) and (orientation: landscape) {
   .fleetbar { padding: 6px 12px; }
   .fleet-stats { gap: 12px; }
+  .control-deck { left: 10px; right: auto; top: 84px; bottom: 60px; width: 182px; }
+  .cd-head { display: flex; padding: 8px 10px 6px; font-size: 10px; }
+  .cd-body { flex-direction: column; align-items: stretch; overflow-y: auto; overflow-x: hidden; gap: 6px; padding: 8px 10px; }
+  .cd-section { writing-mode: horizontal-tb; border-left: none; border-bottom: 1px solid var(--line); padding: 4px 0 2px; justify-content: flex-start; font-size: 8px; }
+  .cd-item { width: auto; padding: 5px 7px; }
   .device-panel {
-    top: 54px; bottom: 60px; left: auto; right: 10px;
-    width: 300px; max-height: none; border-radius: 8px; animation: slidein .25s ease;
+    top: 84px; bottom: 60px; left: auto; right: 10px;
+    width: 280px; max-height: none; border-radius: 8px; animation: slidein .25s ease;
   }
-  .toolbar { bottom: 8px; }
+  .toolbar { bottom: 8px; left: 50%; transform: translateX(-50%); }
   .toolbar-hint { display: none; }
   .demo-banner { top: 48px; }
+}
+
+/* ---------- Desktop: control deck as a permanent left rail ---------- */
+@media (min-width: 1000px) and (min-height: 560px) {
+  .control-deck { left: 16px; right: auto; top: 70px; bottom: 90px; width: 238px; }
+  .cd-head { display: flex; }
+  .cd-body { flex-direction: column; align-items: stretch; overflow-y: auto; overflow-x: hidden; gap: 8px; padding: 12px 14px; }
+  .cd-section { writing-mode: horizontal-tb; border-left: none; border-bottom: 1px solid var(--line); padding: 6px 0 3px; justify-content: flex-start; font-size: 9px; }
+  .cd-item { width: auto; }
+  .device-panel { bottom: 90px; }
 }

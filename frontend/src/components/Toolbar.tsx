@@ -1,5 +1,6 @@
 import React from 'react'
 import { useStore } from '../store'
+import { blip } from '../audio'
 
 export function Toolbar() {
   const mode = useStore(s => s.mode)
@@ -11,10 +12,10 @@ export function Toolbar() {
   return (
     <div className="toolbar">
       <div className="toolbar-group">
-        <button className={`tb-btn ${mode === 'demo' ? 'tb-active' : ''}`} onClick={() => setMode('demo')} title="Simulated fleet">
+        <button className={`tb-btn ${mode === 'demo' ? 'tb-active' : ''}`} onClick={() => { setMode('demo'); blip('mode') }} title="Simulated fleet">
           ◐<span className="tb-label"> Demo</span>
         </button>
-        <button className={`tb-btn ${mode === 'live' ? 'tb-active' : ''}`} onClick={() => setMode('live')} title="Real devices via backend">
+        <button className={`tb-btn ${mode === 'live' ? 'tb-active' : ''}`} onClick={() => { setMode('live'); blip('mode') }} title="Real devices via backend">
           ●<span className="tb-label"> Live</span>
         </button>
       </div>

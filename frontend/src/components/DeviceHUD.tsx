@@ -3,6 +3,7 @@ import { Html } from '@react-three/drei'
 import type { Device } from '../types'
 import { fmt, fmtBytesMB, fmtInt } from '../types'
 import { KIND_COLOR } from './DeviceModel'
+import { blip } from '../audio'
 
 const ENGINE_LABEL: Record<string, string> = {
   sglang: 'SGLang', vllm: 'vLLM', ollama: 'Ollama', llamacpp: 'llama.cpp',
@@ -36,7 +37,7 @@ export function DeviceHUD({ device, selected, onSelect, lift = 0 }: {
       <div
         className={`hud ${isMobile ? 'hud-compact' : ''} ${selected ? 'hud-selected' : ''} ${offline ? 'hud-offline' : ''}`}
         style={{ '--hud-color': color } as React.CSSProperties}
-        onClick={(e) => { e.stopPropagation(); onSelect() }}
+        onClick={(e) => { e.stopPropagation(); onSelect(); blip('select') }}
       >
         {head}
         {offline ? (

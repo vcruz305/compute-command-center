@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { Edges, RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 import type { Device } from '../types'
+import { useStore } from '../store'
 
 const CYAN = '#22d3ee'
 const GOLD = '#fbbf24'
@@ -76,8 +77,9 @@ function Body({ size, radius = 0.1, color, finish, opacity = 0.72, emissive = 0.
   opacity?: number; emissive?: number
 }) {
   const mat = useRef<THREE.MeshPhysicalMaterial>(null)
+  const hologram = useStore(s => s.viz.hologram)
   useFrame(({ clock }) => {
-    if (mat.current) mat.current.emissiveIntensity = emissive + Math.sin(clock.elapsedTime * 2.0) * 0.1
+    if (mat.current) mat.current.emissiveIntensity = (hologram ? emissive + 0.6 : emissive) + Math.sin(clock.elapsedTime * 2.0) * 0.1
   })
   return (
     <RoundedBox args={size} radius={radius} smoothness={4} creaseAngle={0.4}>
@@ -87,7 +89,8 @@ function Body({ size, radius = 0.1, color, finish, opacity = 0.72, emissive = 0.
         emissive={color}
         emissiveIntensity={emissive}
         transparent
-        opacity={opacity}
+        opacity={hologram ? 0.16 : opacity}
+        wireframe={hologram}
         roughness={0.28}
         metalness={0.9}
         clearcoat={0.6}

@@ -1,6 +1,7 @@
 import React from 'react'
 import { useStore } from '../store'
 import { fmt, fmtBytesMB, fmtInt, fmtRate } from '../types'
+import { blip, resumeAudio, setSoundEnabled } from '../audio'
 
 function Stat({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
@@ -16,6 +17,8 @@ export function FleetBar() {
   const mode = useStore(s => s.mode)
   const conn = useStore(s => s.conn)
   const devices = useStore(s => s.devices)
+  const sound = useStore(s => s.sound)
+  const setSound = useStore(s => s.setSound)
   const a = aggregate
   const isDemo = mode === 'demo' || devices.every(d => d.demo)
   return (
@@ -46,6 +49,15 @@ export function FleetBar() {
             {conn === 'connected' ? 'LINKED' : conn === 'connecting' ? 'LINKING…' : conn === 'error' ? 'LINK ERR' : 'OFFLINE'}
           </span>
         )}
+        <button
+          type="button"
+          className={`sound-btn ${sound ? 'on' : ''}`}
+          aria-pressed={sound}
+          title={sound ? 'Mute sound' : 'Unmute sound'}
+          onClick={() => { const next = !sound; setSound(next); setSoundEnabled(next); if (next) resumeAudio(); blip('toggle') }}
+        >
+          {sound ? '🔊' : '🔇'}
+        </button>
       </div>
     </header>
   )
