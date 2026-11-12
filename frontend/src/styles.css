@@ -214,26 +214,22 @@ button { touch-action: manipulation; }
   .fleet-mode { order: 2; gap: 6px; }
   .mode-badge, .conn-badge { font-size: 10px; padding: 4px 8px; }
   .fleet-stats {
-    order: 3; flex-basis: 100%; flex-wrap: nowrap; overflow-x: auto;
-    gap: 14px; padding: 2px 2px 6px; -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    mask-image: linear-gradient(90deg, #000 86%, transparent);
-    -webkit-mask-image: linear-gradient(90deg, #000 86%, transparent);
+    order: 3; flex-basis: 100%; flex-wrap: wrap; overflow: visible;
+    gap: 6px 16px; padding: 2px 2px 4px;
   }
-  .fleet-stats::-webkit-scrollbar { display: none; }
   .fleet-stat { flex-shrink: 0; }
   .fleet-stat-value { font-size: 12px; }
 
   .demo-banner {
-    top: calc(90px + env(safe-area-inset-top)); font-size: 8px; letter-spacing: 1px;
+    top: calc(122px + env(safe-area-inset-top)); font-size: 8px; letter-spacing: 1px;
     padding: 4px 10px; max-width: 92vw; text-align: center;
   }
 
   /* HUDs: fixed-size name tags (full metrics live in the tap-through sheet) */
   .hud { width: 150px; padding: 6px 8px; }
-  .hud-compact { width: auto; max-width: 120px; padding: 4px 8px; }
+  .hud-compact { width: auto; max-width: 138px; padding: 4px 8px; }
   .hud-compact .hud-head { margin-bottom: 0; gap: 5px; }
-  .hud-compact .hud-name { font-size: 11px; max-width: 60px; }
+  .hud-compact .hud-name { font-size: 10px; max-width: 82px; }
   .hud-compact .hud-sim { margin-left: 4px; }
   .hud-tag-gpu { font-family: var(--mono); font-size: 10px; color: var(--hud-color); margin-left: auto; }
   .hud-compact .hud-tail { bottom: -12px; height: 12px; }

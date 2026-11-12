@@ -63,7 +63,7 @@ function defaultPositions(devices: Device[], existing: Positions): Positions {
         const rows = Math.ceil(n / cols)
         const row = Math.floor(i / cols), col = i % cols
         const inRow = Math.min(cols, n - row * cols)
-        out[d.id] = [(col - (inRow - 1) / 2) * 9.5, (row - (rows - 1) / 2) * 7.0]
+        out[d.id] = [(col - (inRow - 1) / 2) * 10.5, (row - (rows - 1) / 2) * 7.0]
       } else {
         const angle = (i / Math.max(n, 1)) * Math.PI * 2 - Math.PI / 2
         const radius = n <= 1 ? 0 : 8.5

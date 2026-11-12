@@ -79,6 +79,8 @@ function DeviceNode({ device, dragId, setDragId, controls, index }: {
   const [x, z] = positions[device.id] || [0, 0]
   const selected = selectedId === device.id
   const downPos = useRef<[number, number] | null>(null)
+  // Larger machines on phones so the fleet reads as substantial, not tiny.
+  const boost = typeof window !== 'undefined' && window.innerWidth < 640 ? 1.45 : 1
 
   const onDown = useCallback((e: any) => {
     e.stopPropagation()
@@ -96,7 +98,9 @@ function DeviceNode({ device, dragId, setDragId, controls, index }: {
       onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'grab' }}
       onPointerOut={() => { document.body.style.cursor = 'auto' }}
     >
-      <DeviceModel device={device} selected={selected} hovered={false} />
+      <group scale={boost}>
+        <DeviceModel device={device} selected={selected} hovered={false} />
+      </group>
       <DeviceHUD device={device} selected={selected} onSelect={() => select(device.id)} lift={0} />
     </group>
   )
@@ -219,7 +223,7 @@ export function Scene() {
   // Pull the camera back and widen FOV on portrait phones so the whole fleet
   // ring stays in frame; cap pixel ratio on touch/small screens for fluid orbit.
   const camera = useMemo(() => portrait
-    ? { position: [0, 26, 48] as [number, number, number], fov: 60 }
+    ? { position: [0, 23, 42] as [number, number, number], fov: 58 }
     : { position: [0, 14, 20] as [number, number, number], fov: 50 }, [portrait])
   const dprMax = coarse || small ? 1.5 : 1.75
   return (
