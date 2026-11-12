@@ -39,6 +39,7 @@ interface State {
   positions: Positions
   showAdd: boolean
   showConnect: boolean
+  showSettings: boolean
   followSelected: boolean
   viz: Viz
   sound: boolean
@@ -51,6 +52,7 @@ interface State {
   setPosition: (id: string, x: number, z: number) => void
   setShowAdd: (v: boolean) => void
   setShowConnect: (v: boolean) => void
+  setShowSettings: (v: boolean) => void
   setFollow: (v: boolean) => void
   setViz: (patch: Partial<Viz>) => void
   setSound: (v: boolean) => void
@@ -121,6 +123,7 @@ export const useStore = create<State>((set, get) => ({
   positions: JSON.parse(load('occ.positions', '{}')),
   showAdd: false,
   showConnect: false,
+  showSettings: false,
   followSelected: false,
   viz: loadViz(),
   sound: load('occ.sound', '1') === '1',
@@ -192,6 +195,7 @@ export const useStore = create<State>((set, get) => ({
   },
   setShowAdd: (v) => set({ showAdd: v }),
   setShowConnect: (v) => set({ showConnect: v }),
+  setShowSettings: (v) => set({ showSettings: v }),
   setFollow: (v) => set({ followSelected: v }),
   setViz: (patch) => {
     const viz = { ...get().viz, ...patch }

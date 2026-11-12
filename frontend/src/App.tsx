@@ -3,7 +3,8 @@ import { Scene } from './components/Scene'
 import { FleetBar } from './components/FleetBar'
 import { DevicePanel } from './components/DevicePanel'
 import { Toolbar } from './components/Toolbar'
-import { ControlDeck } from './components/ControlDeck'
+import { FleetDeck } from './components/FleetDeck'
+import { SettingsPanel } from './components/SettingsPanel'
 import { ConnectModal, AddDeviceModal } from './components/Modals'
 import { useStore, bootStore } from './store'
 import { resumeAudio, setSoundEnabled } from './audio'
@@ -28,7 +29,8 @@ export default function App() {
       <Scene />
       <FleetBar />
       <DevicePanel />
-      <ControlDeck />
+      <FleetDeck />
+      <SettingsPanel />
       <Toolbar />
       <ConnectModal />
       <AddDeviceModal />

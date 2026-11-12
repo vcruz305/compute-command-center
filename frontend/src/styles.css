@@ -204,7 +204,7 @@ button { touch-action: manipulation; }
 .sound-btn:hover { border-color:var(--cyan); }
 
 /* ---------- Control deck (base = bottom strip) ---------- */
-.control-deck {
+.fleet-deck {
   position:absolute; z-index:24; left:10px; right:10px;
   bottom:calc(64px + env(safe-area-inset-bottom));
   background:var(--panel); border:1px solid var(--line); border-radius:10px;
@@ -272,6 +272,53 @@ button { touch-action: manipulation; }
 .cd-body::-webkit-scrollbar-thumb { background:var(--line); border-radius:3px; }
 .cd-body::-webkit-scrollbar-thumb:hover { background:var(--cyan); }
 .cd-body, .dp-scroll, .modal { scrollbar-width:thin; scrollbar-color:var(--line) rgba(2,8,14,.5); }
+
+/* ---------- Fleet deck roster ---------- */
+.fd-head { display:none; align-items:center; gap:8px; font-family:var(--disp); font-size:11px; letter-spacing:2px; color:var(--cyan); padding:12px 14px 8px; border-bottom:1px solid var(--line); }
+.fd-head-dot { width:7px; height:7px; border-radius:50%; background:var(--cyan); box-shadow:0 0 8px var(--cyan); animation:pulse 2.4s infinite; }
+.fd-count { font-family:var(--mono); font-size:9px; color:var(--dim); letter-spacing:1px; }
+.fd-gear { margin-left:auto; width:28px; height:28px; display:flex; align-items:center; justify-content:center; background:rgba(2,8,14,.6); border:1px solid var(--line); border-radius:5px; color:var(--dim); font-size:15px; cursor:pointer; transition:all .2s; line-height:1; }
+.fd-gear:hover { color:var(--cyan); border-color:var(--cyan); box-shadow:0 0 10px rgba(34,211,238,.25); transform:rotate(45deg); }
+.fd-body { display:flex; flex-direction:row; align-items:stretch; gap:8px; overflow-x:auto; overflow-y:hidden; padding:8px 10px; }
+.fd-gear-tile { flex:0 0 auto; width:60px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; background:rgba(34,211,238,.07); border:1px solid var(--line); border-radius:8px; color:var(--cyan); cursor:pointer; transition:all .15s; }
+.fd-gear-tile:hover { border-color:var(--cyan); box-shadow:0 0 12px rgba(34,211,238,.25); }
+.fd-gear-ico { font-size:19px; line-height:1; }
+.fd-gear-count { font-family:var(--mono); font-size:11px; color:var(--text); }
+.fd-gear-label { font-family:var(--mono); font-size:7px; letter-spacing:1px; color:var(--dim); }
+.fd-card { flex:0 0 auto; width:150px; display:flex; flex-direction:column; gap:3px; text-align:left; background:rgba(2,8,14,.55); border:1px solid var(--line); border-left:3px solid var(--fd-color,var(--cyan)); border-radius:8px; padding:7px 9px; cursor:pointer; transition:border-color .15s, box-shadow .15s, background .15s; font-family:var(--body); color:var(--text); }
+.fd-card:hover { border-color:var(--fd-color,var(--cyan)); box-shadow:0 0 14px rgba(34,211,238,.18); }
+.fd-selected { border-color:#fff; box-shadow:0 0 16px rgba(255,255,255,.22); background:rgba(34,211,238,.08); }
+.fd-offline { opacity:.55; }
+.fd-top { display:flex; align-items:center; gap:6px; }
+.fd-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.fd-name { font-family:var(--disp); font-size:11px; font-weight:700; color:#fff; letter-spacing:.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; min-width:0; }
+.fd-sim { font-family:var(--mono); font-size:7px; color:var(--gold); border:1px solid rgba(251,191,36,.5); padding:0 3px; border-radius:2px; flex-shrink:0; }
+.fd-req { font-family:var(--mono); font-size:8px; color:var(--cyan); flex-shrink:0; }
+.fd-sub { display:none; font-family:var(--mono); font-size:8px; letter-spacing:.5px; color:var(--dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fd-model { display:none; font-family:var(--mono); font-size:9px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fd-bar { height:3px; border-radius:2px; background:rgba(2,8,14,.9); overflow:hidden; }
+.fd-bar span { display:block; height:100%; background:linear-gradient(90deg, var(--fd-color,var(--cyan)), var(--blue)); border-radius:2px; transition:width .6s ease; }
+.fd-metrics { display:flex; gap:6px; }
+.fd-metrics2 { display:none; }
+.fd-m { flex:1; display:flex; flex-direction:column; min-width:0; }
+.fd-mk { font-family:var(--mono); font-size:6px; letter-spacing:.5px; color:var(--dim); }
+.fd-mv { font-family:var(--mono); font-size:10px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fd-tps { color:var(--gold); }
+.fd-empty { font-size:12px; color:var(--dim); font-style:italic; padding:8px; align-self:center; }
+.fd-body::-webkit-scrollbar { height:6px; width:6px; }
+.fd-body::-webkit-scrollbar-track { background:rgba(2,8,14,.5); border-radius:3px; }
+.fd-body::-webkit-scrollbar-thumb { background:var(--line); border-radius:3px; }
+.fd-body::-webkit-scrollbar-thumb:hover { background:var(--cyan); }
+.fd-body { scrollbar-width:thin; scrollbar-color:var(--line) rgba(2,8,14,.5); }
+
+/* ---------- Settings modal (gear) ---------- */
+.settings-modal { width:400px; max-height:84vh; display:flex; flex-direction:column; padding:0; overflow:hidden; }
+.settings-head { display:flex; align-items:center; justify-content:space-between; padding:16px 18px 12px; border-bottom:1px solid var(--line); }
+.settings-head h3 { margin:0; font-size:14px; letter-spacing:2px; }
+.settings-modal .cd-body { flex:1; flex-direction:column; align-items:stretch; overflow-y:auto; overflow-x:hidden; gap:8px; padding:14px 18px; }
+.settings-modal .cd-item { width:100%; }
+.settings-modal .cd-section { writing-mode:horizontal-tb; text-orientation:mixed; border-left:none; border-bottom:1px solid var(--line); padding:8px 0 4px; justify-content:flex-start; font-size:10px; }
+.settings-modal .cd-actions, .settings-modal .cd-reset { width:100%; }
 
 /* short labels + touch hint are hidden on desktop by default */
 .tb-short { display: none; }
@@ -357,6 +404,8 @@ button { touch-action: manipulation; }
   .modal-grid { grid-template-columns: 1fr; }
   .modal-actions .tb-btn { flex: 1; min-height: 46px; }
   .ts-node { padding: 8px 10px; font-size: 13px; }
+  .settings-modal { padding: 0; max-height: 88vh; }
+  .settings-modal .cd-body { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
 }
 
 @keyframes sheetup { from { transform: translateY(46px); opacity: 0 } to { transform: none; opacity: 1 } }
@@ -386,11 +435,13 @@ button { touch-action: manipulation; }
 @media (max-height: 480px) and (orientation: landscape) {
   .fleetbar { padding: 6px 12px; }
   .fleet-stats { gap: 12px; }
-  .control-deck { left: 10px; right: auto; top: 84px; bottom: 60px; width: 182px; }
-  .cd-head { display: flex; padding: 8px 10px 6px; font-size: 10px; }
-  .cd-body { flex-direction: column; align-items: stretch; overflow-y: auto; overflow-x: hidden; gap: 6px; padding: 8px 10px; }
-  .cd-section { writing-mode: horizontal-tb; border-left: none; border-bottom: 1px solid var(--line); padding: 4px 0 2px; justify-content: flex-start; font-size: 8px; }
-  .cd-item { width: auto; padding: 5px 7px; }
+  .fleet-deck { left: 10px; right: auto; top: 84px; bottom: 60px; width: 200px; }
+  .fd-head { display: flex; padding: 8px 10px 6px; font-size: 10px; }
+  .fd-gear-tile { display: none; }
+  .fd-body { flex-direction: column; align-items: stretch; overflow-y: auto; overflow-x: hidden; gap: 6px; padding: 8px 10px; }
+  .fd-card { width: auto; padding: 6px 8px; }
+  .fd-sub, .fd-model { display: block; }
+  .fd-metrics2 { display: flex; }
   .device-panel {
     top: 84px; bottom: 60px; left: auto; right: 10px;
     width: 280px; max-height: none; border-radius: 8px; animation: slidein .25s ease;
@@ -402,10 +453,12 @@ button { touch-action: manipulation; }
 
 /* ---------- Desktop: control deck as a permanent left rail ---------- */
 @media (min-width: 1000px) and (min-height: 560px) {
-  .control-deck { left: 16px; right: auto; top: 70px; bottom: 90px; width: 238px; }
-  .cd-head { display: flex; }
-  .cd-body { flex-direction: column; align-items: stretch; overflow-y: auto; overflow-x: hidden; gap: 8px; padding: 12px 14px; }
-  .cd-section { writing-mode: horizontal-tb; border-left: none; border-bottom: 1px solid var(--line); padding: 6px 0 3px; justify-content: flex-start; font-size: 9px; }
-  .cd-item { width: auto; }
+  .fleet-deck { left: 16px; right: auto; top: 70px; bottom: 90px; width: 250px; }
+  .fd-head { display: flex; }
+  .fd-gear-tile { display: none; }
+  .fd-body { flex-direction: column; align-items: stretch; overflow-y: auto; overflow-x: hidden; gap: 8px; padding: 12px 14px; }
+  .fd-card { width: auto; }
+  .fd-sub, .fd-model { display: block; }
+  .fd-metrics2 { display: flex; }
   .device-panel { bottom: 90px; }
 }
