@@ -164,6 +164,13 @@ button { touch-action: manipulation; }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
 .modal-test { margin-top: 12px; font-family: var(--mono); font-size: 11px; color: var(--gold); }
 .modal-test.ok { color: #4ade80; }
+.modal-steps { margin: 10px 0 4px; padding-left: 20px; display: flex; flex-direction: column; gap: 7px; }
+.modal-steps li { font-size: 12.5px; color: var(--text); line-height: 1.45; }
+.modal-steps li::marker { color: var(--cyan); font-family: var(--mono); }
+.modal-steps b { color: #fff; font-weight: 600; }
+.modal-steps code { font-family: var(--mono); font-size: 11px; color: var(--cyan); background: rgba(34,211,238,.08); border: 1px solid var(--line); padding: 1px 5px; border-radius: 3px; }
+.modal-link { display: inline-block; margin-top: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: .5px; color: var(--cyan); text-decoration: none; border-bottom: 1px dashed var(--line); }
+.modal-link:hover { border-bottom-color: var(--cyan); }
 .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
 .modal-span { grid-column: 1 / -1; }
 .ts-nodes { margin-bottom: 8px; }
@@ -180,6 +187,12 @@ button { touch-action: manipulation; }
   position: absolute; top: 66px; left: 50%; transform: translateX(-50%); z-index: 18;
   font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; color: var(--gold);
   background: rgba(251,191,36,.08); border: 1px solid rgba(251,191,36,.35);
+  padding: 5px 14px; border-radius: 3px;
+}
+.live-banner {
+  position: absolute; top: 66px; left: 50%; transform: translateX(-50%); z-index: 18;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; color: var(--cyan);
+  background: rgba(34,211,238,.08); border: 1px solid var(--line);
   padding: 5px 14px; border-radius: 3px;
 }
 
@@ -304,7 +317,12 @@ button { touch-action: manipulation; }
 .fd-mk { font-family:var(--mono); font-size:6px; letter-spacing:.5px; color:var(--dim); }
 .fd-mv { font-family:var(--mono); font-size:10px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .fd-tps { color:var(--gold); }
-.fd-empty { font-size:12px; color:var(--dim); font-style:italic; padding:8px; align-self:center; }
+.fd-empty-state { flex:1 1 auto; min-width:210px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:7px; padding:16px 14px; }
+.fd-empty-ico { font-size:26px; color:var(--cyan); text-shadow:0 0 16px var(--cyan); line-height:1; }
+.fd-empty-title { font-family:var(--disp); font-size:13px; font-weight:700; letter-spacing:1px; color:#fff; }
+.fd-empty-sub { font-size:12px; color:var(--dim); line-height:1.45; max-width:250px; }
+.fd-empty-actions { display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; justify-content:center; }
+.fd-empty-actions .tb-btn { font-size:12px; padding:8px 12px; }
 .fd-body::-webkit-scrollbar { height:6px; width:6px; }
 .fd-body::-webkit-scrollbar-track { background:rgba(2,8,14,.5); border-radius:3px; }
 .fd-body::-webkit-scrollbar-thumb { background:var(--line); border-radius:3px; }
@@ -355,6 +373,15 @@ button { touch-action: manipulation; }
     top: calc(122px + env(safe-area-inset-top)); font-size: 8px; letter-spacing: 1px;
     padding: 4px 10px; max-width: 92vw; text-align: center;
   }
+  .live-banner {
+    top: calc(122px + env(safe-area-inset-top)); font-size: 8px; letter-spacing: 1px;
+    padding: 4px 10px; max-width: 92vw; text-align: center;
+  }
+  .fd-empty-state { min-width: 200px; padding: 10px 12px; gap: 5px; }
+  .fd-empty-ico { font-size: 20px; }
+  .fd-empty-title { font-size: 12px; }
+  .fd-empty-sub { font-size: 11px; }
+  .fd-empty-actions .tb-btn { padding: 7px 10px; font-size: 11px; }
 
   /* HUDs: fixed-size name tags (full metrics live in the tap-through sheet) */
   .hud { width: 150px; padding: 6px 8px; }

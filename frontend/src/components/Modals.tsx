@@ -13,6 +13,7 @@ export function ConnectModal() {
   useEffect(() => { if (show) { setUrl(backendUrl); setTest(null) } }, [show, backendUrl])
   if (!show) return null
   const doTest = async () => {
+    if (!url.trim()) { setTest('Enter a backend URL first.'); return }
     setTest('testing…')
     try {
       const r = await fetch(url.replace(/\/+$/, '') + '/api/health', { signal: AbortSignal.timeout(6000) })
@@ -24,13 +25,20 @@ export function ConnectModal() {
     <div className="modal-backdrop" onClick={() => setShow(false)}>
       <div className="modal" onClick={e => e.stopPropagation()}>
         <h3>Connect Telemetry Backend</h3>
-        <p className="modal-note">The 3D frontend is static; real metrics stream from a FastAPI backend over WebSocket. Enter its HTTPS URL (e.g. a Tailscale Funnel address).</p>
+        <p className="modal-note">The 3D frontend is static. Real metrics stream from a small FastAPI backend that collects them over SSH and broadcasts them over WebSocket. To go live:</p>
+        <ol className="modal-steps">
+          <li><b>Run the backend</b> on a machine that can SSH into your devices (<code>backend/run.sh</code>).</li>
+          <li><b>Expose it over HTTPS</b> — e.g. <code>tailscale funnel 8090</code>. Browsers block plain-HTTP backends.</li>
+          <li><b>Paste its HTTPS URL</b> below and press Connect. Devices registered on the backend appear within seconds.</li>
+        </ol>
         <label className="modal-label">Backend URL</label>
         <input className="modal-input" value={url} onChange={e => setUrl(e.target.value)} placeholder="https://your-host.tailnet.ts.net" />
         <div className="modal-actions">
           <button className="tb-btn" onClick={doTest}>Test</button>
-          <button className="tb-btn tb-primary" onClick={() => { connect(url); setShow(false) }}>Connect</button>
+          <button className="tb-btn tb-primary" onClick={() => { if (!url.trim()) { setTest('Enter a backend URL first.'); return } connect(url, true); setShow(false) }}>Connect</button>
         </div>
+        <a className="modal-link" href="https://github.com/vcruz305/constellation#run-it" target="_blank" rel="noreferrer">Full setup guide (repo README) ↗</a>
+        <p className="modal-note">SSH keys and credentials stay on the backend server — they are never sent to the browser.</p>
         {test && <div className="modal-test">{test}</div>}
         {conn === 'connected' && <div className="modal-test ok">Currently linked.</div>}
       </div>
@@ -97,7 +105,7 @@ export function AddDeviceModal() {
           </div>
         )}
         <div className="modal-grid">
-          <div><label className="modal-label">Name</label><input className="modal-input" value={name} onChange={e => setName(e.target.value)} placeholder="Spark-724a" /></div>
+          <div><label className="modal-label">Name</label><input className="modal-input" value={name} onChange={e => setName(e.target.value)} placeholder="gpu-node-01" /></div>
           <div><label className="modal-label">Type</label>
             <select className="modal-input" value={kind} onChange={e => setKind(e.target.value)}>
               <option value="auto">Auto-detect</option><option value="dgx-spark">DGX Spark</option>

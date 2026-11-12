@@ -15,6 +15,7 @@ export default function App() {
   const theme = useStore(s => s.viz.theme)
   const sound = useStore(s => s.sound)
   const isDemo = mode === 'demo' || (devices.length > 0 && devices.every(d => d.demo))
+  const liveEmpty = mode === 'live' && devices.length === 0
   useEffect(() => { bootStore() }, [])
   // Keep the audio module's mute flag in sync without creating a context early.
   useEffect(() => { setSoundEnabled(sound) }, [sound])
@@ -35,6 +36,7 @@ export default function App() {
       <ConnectModal />
       <AddDeviceModal />
       {isDemo && <div className="demo-banner">SIMULATED FLEET — connect a backend for live telemetry</div>}
+      {liveEmpty && <div className="live-banner">LIVE · NO DEVICES CONFIGURED — connect a backend</div>}
       <div className="scanlines" />
     </div>
   )

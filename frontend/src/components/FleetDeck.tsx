@@ -83,6 +83,12 @@ export function FleetDeck() {
   const devices = useStore(s => s.devices)
   const selectedId = useStore(s => s.selectedId)
   const setShowSettings = useStore(s => s.setShowSettings)
+  const mode = useStore(s => s.mode)
+  const conn = useStore(s => s.conn)
+  const backendUrl = useStore(s => s.backendUrl)
+  const setShowConnect = useStore(s => s.setShowConnect)
+  const setShowAdd = useStore(s => s.setShowAdd)
+  const setMode = useStore(s => s.setMode)
   const bodyRef = useRef<HTMLDivElement>(null)
   const online = devices.filter(d => d.status === 'online').length
   // Bring the selected device's card into view (e.g. when picked via its 3D tag).
@@ -110,7 +116,31 @@ export function FleetDeck() {
           <span className="fd-gear-label">FLEET</span>
         </button>
         {sorted.map(d => <Card key={d.id} d={d} />)}
-        {devices.length === 0 && <div className="fd-empty">No devices yet — add one from the toolbar.</div>}
+        {devices.length === 0 && (
+          <div className="fd-empty-state">
+            <div className="fd-empty-ico">{mode === 'live' ? '⌁' : '◐'}</div>
+            <div className="fd-empty-title">
+              {mode !== 'live' ? 'No devices'
+                : conn === 'connecting' ? 'Linking to backend…'
+                : 'No devices configured'}
+            </div>
+            <div className="fd-empty-sub">
+              {mode !== 'live' ? 'Add a device to get started.'
+                : conn === 'connecting' ? 'Waiting for the first telemetry frame.'
+                : conn === 'connected' ? 'Backend linked, but no devices are registered yet. Add one to see it here.'
+                : backendUrl ? 'Backend unreachable. Check the URL and that it is running.'
+                : 'Connect a telemetry backend to stream live metrics from your own fleet.'}
+            </div>
+            {mode === 'live' && (
+              <div className="fd-empty-actions">
+                {conn === 'connected'
+                  ? <button type="button" className="tb-btn tb-primary" onClick={() => setShowAdd(true)}>＋ Add Device</button>
+                  : <button type="button" className="tb-btn tb-primary" onClick={() => setShowConnect(true)}>⌁ Connect Backend</button>}
+                <button type="button" className="tb-btn" onClick={() => setMode('demo')}>◐ Try Demo</button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </aside>
   )

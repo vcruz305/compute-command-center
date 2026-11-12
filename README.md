@@ -6,8 +6,8 @@ A futuristic, TRON-inspired **3D observability dashboard** for GPU infrastructur
 devices are collected over SSH/Tailscale and streamed live into holographic machine models
 with floating HUDs, an aggregated fleet dashboard, and per-device charts.
 
-**Live demo:** https://vcruz305.github.io/constellation/
-**Full app (owner's tailnet):** `https://hermes-vps.tailda7808.ts.net`
+**Live demo (simulated):** https://vcruz305.github.io/constellation/
+**Self-hosted live app:** serve the frontend from the backend (same origin) or expose it over HTTPS — see [Run it](#run-it).
 
 ---
 
@@ -39,8 +39,9 @@ frontend/   React + Three.js (react-three-fiber) + postprocessing bloom, Zustand
 backend/    Python FastAPI + WebSocket, async SSH collectors, modular inference adapters
 ```
 
-- The **frontend** is a static site (GitHub Pages). It runs a built-in **demo fleet** by
-  default and auto-links to a backend when one is reachable.
+- The **frontend** is a static site (GitHub Pages). The public demo runs a built-in
+  **simulated fleet** and never auto-connects to anyone's backend. Self-hosted builds
+  (the backend serving the frontend) auto-link to their own origin.
 - The **backend** runs on a host with SSH access to your devices. It executes a lightweight
   remote probe (`remote_probe.py`) on each device, parses real system/GPU/inference
   telemetry, computes rates, and broadcasts a fleet frame every 3 s over `/ws`.
@@ -65,7 +66,7 @@ pip install fastapi "uvicorn[standard]" websockets
 Add a device (SSH key/agent access must already work from this host):
 ```bash
 curl -X POST localhost:8090/api/devices -H 'Content-Type: application/json' \
-  -d '{"name":"Spark","kind":"auto","connection":{"type":"ssh","host":"cruzspark"}}'
+  -d '{"name":"gpu-node-01","kind":"auto","connection":{"type":"ssh","host":"gpu-node-01"}}'
 ```
 Or use the in-app **＋ Add Device** dialog (with Tailscale discovery).
 
@@ -83,6 +84,18 @@ Tailscale **Funnel** in the tailnet admin console and `tailscale funnel --bg 809
 
 > GitHub Pages is HTTPS, so the browser blocks a plain `http://<ip>` backend (mixed
 > content). Use Tailscale Serve/Funnel (valid certificates) or another HTTPS host.
+
+### Connect the hosted frontend to your backend
+The public demo deliberately starts with **no backend prefilled** and shows the simulated
+fleet. To monitor your own machines:
+1. Run the backend (above) and add your devices server-side.
+2. Expose it over HTTPS (Serve/Funnel).
+3. In the app, press **⌁ Backend**, paste the HTTPS URL, and **Connect** — or press
+   **● Live**, then **Connect Backend** from the empty fleet.
+
+Switching to **Live** with no backend configured shows **"No devices configured"**; it
+never presents the simulated fleet as if it were real. SSH keys/credentials stay on the
+backend server and are never sent to the browser.
 
 ## Deploy to GitHub Pages
 ```bash

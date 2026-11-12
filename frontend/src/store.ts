@@ -46,7 +46,7 @@ interface State {
   resetCamNonce: number
   // actions
   setMode: (m: Mode) => void
-  connect: (url: string) => void
+  connect: (url: string, fresh?: boolean) => void
   disconnect: () => void
   select: (id: string | null) => void
   setPosition: (id: string, x: number, z: number) => void
@@ -65,14 +65,14 @@ let demoTimer: ReturnType<typeof setInterval> | null = null
 let ws: WebSocket | null = null
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null
 
-// Default telemetry backend. When the app is served by the backend itself
-// (same origin, e.g. the Tailscale HTTPS URL) use that origin; when hosted on
-// GitHub Pages, point at the Tailscale Serve endpoint. Visitors off the tailnet
-// simply stay in demo mode; the owner's devices auto-link.
+// Default telemetry backend. Self-hosted / same-origin builds (the backend
+// serving the frontend) use their own origin and auto-link. Public static
+// hosting (GitHub Pages) never prefills or auto-dials a private backend — it
+// stays in demo until the visitor connects their own.
+export const IS_PUBLIC =
+  typeof location !== 'undefined' && location.hostname.endsWith('github.io')
 export const DEFAULT_BACKEND =
-  (typeof location !== 'undefined' && location.hostname.endsWith('github.io'))
-    ? 'https://hermes-vps.tailda7808.ts.net'
-    : (typeof location !== 'undefined' ? location.origin : '')
+  IS_PUBLIC ? '' : (typeof location !== 'undefined' ? location.origin : '')
 
 const load = (k: string, fallback: string) => {
   try { return localStorage.getItem(k) ?? fallback } catch { return fallback }
@@ -112,8 +112,8 @@ function defaultPositions(devices: Device[], existing: Positions): Positions {
 }
 
 export const useStore = create<State>((set, get) => ({
-  mode: (load('occ.mode', 'demo') as Mode),
-  backendUrl: load('occ.backendUrl', DEFAULT_BACKEND),
+  mode: (IS_PUBLIC ? 'demo' : load('occ.mode', 'demo')) as Mode,
+  backendUrl: IS_PUBLIC ? '' : load('occ.backendUrl', DEFAULT_BACKEND),
   conn: 'disconnected',
   connError: null,
   devices: [],
@@ -142,14 +142,19 @@ export const useStore = create<State>((set, get) => ({
       startDemo(set, get)
     } else {
       stopDemo()
-      set({ mode: 'live' })
+      // Entering Live clears the simulated fleet so an unconfigured/unreachable
+      // backend shows "no devices configured" instead of stale demo data.
+      set({ mode: 'live', devices: [], aggregate: null, ts: 0, selectedId: null })
       const url = get().backendUrl
       if (url) get().connect(url)
+      else set({ conn: 'disconnected', connError: null })
     }
   },
 
-  connect: (url) => {
+  connect: (url, fresh) => {
     stopDemo()
+    if (!url) { set({ conn: 'disconnected', connError: null }); return }
+    if (fresh) set({ devices: [], aggregate: null, ts: 0, selectedId: null })
     if (ws) { try { ws.close() } catch {} ws = null }
     if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null }
     const clean = url.replace(/\/+$/, '')
@@ -238,10 +243,12 @@ function stopDemo() {
 // boot
 export function bootStore() {
   const s = useStore.getState()
-  const savedMode = load('occ.mode', '')
-  // Always show the fleet immediately (demo), then auto-link to real telemetry
-  // if the backend is reachable. Visitors off the tailnet stay in demo.
+  // Always show the simulated fleet immediately.
   startDemo(null, useStore.getState)
+  // The public static site never auto-dials a backend; it stays in demo until
+  // the visitor explicitly connects their own. Self-hosted builds auto-link.
+  if (IS_PUBLIC) return
+  const savedMode = load('occ.mode', '')
   if (savedMode !== 'demo' && s.backendUrl) {
     fetch(s.backendUrl + '/api/health', { signal: AbortSignal.timeout(6000) })
       .then(r => r.json())

@@ -12,8 +12,8 @@ interface Def {
 }
 const DEFS: Def[] = [
   { id: 'demo-spark-a', name: 'Spark-Alpha', kind: 'dgx-spark', gpu: 'NVIDIA GB10', vram: 128000, cores: 20, ram: 128000, os: 'Ubuntu 24.04 (DGX OS)', engine: 'sglang', model: 'Qwen3-Next-80B-A3B', ctx: 32768, baseTps: 46, phase: 0.0 },
-  { id: 'demo-spark-b', name: 'Spark-Beta', kind: 'dgx-spark', gpu: 'NVIDIA GB10', vram: 128000, cores: 20, ram: 128000, os: 'Ubuntu 24.04 (DGX OS)', engine: 'rexl3', model: 'GLM-4.6-EXL3-SAGE', ctx: 16384, baseTps: 38, phase: 1.7 },
-  { id: 'demo-frosty', name: 'Frosty', kind: 'gpu-server', gpu: 'NVIDIA RTX PRO 6000 Blackwell', vram: 96000, cores: 64, ram: 256000, os: 'Ubuntu 24.04', engine: 'vllm', model: 'DeepSeek-V3.1', ctx: 65536, baseTps: 62, phase: 3.1 },
+  { id: 'demo-spark-b', name: 'Spark-Beta', kind: 'dgx-spark', gpu: 'NVIDIA GB10', vram: 128000, cores: 20, ram: 128000, os: 'Ubuntu 24.04 (DGX OS)', engine: 'rexl3', model: 'GLM-4.6-EXL3', ctx: 16384, baseTps: 38, phase: 1.7 },
+  { id: 'demo-rtx6000', name: 'RTX 6000', kind: 'gpu-server', gpu: 'NVIDIA RTX PRO 6000 Blackwell', vram: 96000, cores: 64, ram: 256000, os: 'Ubuntu 24.04', engine: 'vllm', model: 'DeepSeek-V3.1', ctx: 65536, baseTps: 62, phase: 3.1 },
   { id: 'demo-studio', name: 'Mac-Studio-01', kind: 'mac-studio', gpu: 'Apple M3 Ultra (80-core GPU)', vram: 256000, cores: 32, ram: 256000, os: 'macOS 15.5', engine: 'mlx', model: 'Llama-3.3-70B-MLX', ctx: 32768, baseTps: 24, phase: 4.4 },
   { id: 'demo-mini', name: 'Mac-Mini-02', kind: 'mac-mini', gpu: 'Apple M4 Pro (20-core GPU)', vram: 48000, cores: 14, ram: 48000, os: 'macOS 15.5', engine: 'ollama', model: 'qwen2.5:14b', ctx: 8192, baseTps: 31, phase: 5.6 },
   { id: 'demo-b200', name: 'B200-Cluster', kind: 'gpu-server', gpu: '8x NVIDIA B200', vram: 1440000, cores: 208, ram: 2048000, os: 'Ubuntu 24.04', engine: 'sglang', model: 'Kimi-K2', ctx: 131072, baseTps: 120, phase: 2.3 },
@@ -45,12 +45,12 @@ export function demoFrame(): FleetFrame {
     const gpu = { name: d.gpu, util_pct: gpuUtil, vram_used_mb: vramUsed, vram_total_mb: d.vram, temp_c: temp, power_w: power, power_limit_w: d.kind === 'gpu-server' ? 300 : 70, vendor: d.kind.startsWith('mac') ? 'apple' : 'nvidia' }
     return {
       id: d.id, name: d.name, kind: d.kind, status: 'online', last_error: null, last_seen: t, demo: true,
-      specs: { hostname: d.name.toLowerCase(), os: d.os, arch: d.kind.startsWith('mac') || d.kind === 'dgx-spark' ? 'arm64' : 'x86_64', cpu_cores: d.cores, cpu_model: d.gpu, ram_total_mb: d.ram, gpus: [gpu] },
+      specs: { hostname: d.name.toLowerCase().replace(/\s+/g, '-'), os: d.os, arch: d.kind.startsWith('mac') || d.kind === 'dgx-spark' ? 'arm64' : 'x86_64', cpu_cores: d.cores, cpu_model: d.gpu, ram_total_mb: d.ram, gpus: [gpu] },
       metrics: { cpu_util_pct: cpu, ram_used_mb: ramUsed, ram_total_mb: d.ram, load_avg: [+(cpu / 12).toFixed(2)], uptime_s: 360000 + (Math.floor(t) % 86400), net_rx_bps: rx, net_tx_bps: tx, gpus: [gpu] },
       inference: [{ engine: d.engine, port: 8000, models: [d.model], max_context: d.ctx, metrics: { decode_tps_per_request: perReq, decode_tps_aggregate: aggTps, prefill_tps: prefill, ttft_ms: running ? +wave(t, 7, ph, 40, 320).toFixed(1) : null, active_requests: running, queued_requests: Math.round(wave(t, 5, ph, 0, 3)), concurrency: 16, kv_cache_pct: kv, cache_hit_pct: +wave(t, 37, ph, 20, 90).toFixed(1) } }],
       processes: [{ pid: 1000 + idx, name: d.engine, cpu_pct: +(cpu / 3).toFixed(1), mem_pct: +(20 * load).toFixed(1) }],
       gpu_processes: [{ pid: 1000, name: d.engine, gpu_mem_mb: vramUsed }],
-      addresses: { host: `100.64.0.${10 + idx}`, tailscale: `${d.name.toLowerCase()}.demo.ts.net`, ports: [8000, 22] },
+      addresses: { host: `100.64.0.${10 + idx}`, tailscale: `${d.name.toLowerCase().replace(/\s+/g, '-')}.demo.ts.net`, ports: [8000, 22] },
       history: hist,
     }
   })

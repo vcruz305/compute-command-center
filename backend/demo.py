@@ -13,8 +13,8 @@ DEMO_DEFS = [
      "engine": "sglang", "model": "Qwen3-Next-80B-A3B", "ctx": 32768, "base_tps": 46, "phase": 0.0},
     {"id": "demo-spark-b", "name": "Spark-Beta", "kind": "dgx-spark",
      "gpu": "NVIDIA GB10", "vram": 128000, "cores": 20, "ram": 128000, "os": "Ubuntu 24.04 (DGX OS)",
-     "engine": "rexl3", "model": "GLM-4.6-EXL3-SAGE", "ctx": 16384, "base_tps": 38, "phase": 1.7},
-    {"id": "demo-frosty", "name": "Frosty", "kind": "gpu-server",
+     "engine": "rexl3", "model": "GLM-4.6-EXL3", "ctx": 16384, "base_tps": 38, "phase": 1.7},
+    {"id": "demo-rtx6000", "name": "RTX 6000", "kind": "gpu-server",
      "gpu": "NVIDIA RTX PRO 6000 Blackwell", "vram": 96000, "cores": 64, "ram": 256000, "os": "Ubuntu 24.04",
      "engine": "vllm", "model": "DeepSeek-V3.1", "ctx": 65536, "base_tps": 62, "phase": 3.1},
     {"id": "demo-studio", "name": "Mac-Studio-01", "kind": "mac-studio",
@@ -58,7 +58,7 @@ class DemoFleet:
             out.append({
                 "id": d["id"], "name": d["name"], "kind": d["kind"],
                 "status": "online", "last_error": None, "last_seen": t, "demo": True,
-                "specs": {"hostname": d["name"].lower(), "os": d["os"], "arch": "aarch64" if d["kind"].startswith(("dgx", "mac")) else "x86_64",
+                "specs": {"hostname": d["name"].lower().replace(" ", "-"), "os": d["os"], "arch": "aarch64" if d["kind"].startswith(("dgx", "mac")) else "x86_64",
                           "cpu_cores": d["cores"], "cpu_model": d["gpu"], "ram_total_mb": d["ram"],
                           "gpus": [{"name": d["gpu"], "util_pct": gpu_util, "vram_used_mb": vram_used,
                                     "vram_total_mb": d["vram"], "temp_c": temp, "power_w": power,
@@ -77,7 +77,7 @@ class DemoFleet:
                                            "concurrency": 16, "kv_cache_pct": kv, "cache_hit_pct": round(_wave(t, 37, ph, 20, 90), 1)}}],
                 "processes": [{"pid": 1000 + i, "name": d["engine"], "cpu_pct": round(cpu / 3, 1), "mem_pct": round(20 * load, 1)}],
                 "gpu_processes": [{"pid": 1000, "name": d["engine"], "gpu_mem_mb": vram_used}],
-                "addresses": {"host": f"100.64.0.{10 + DEMO_DEFS.index(d)}", "tailscale": d["name"].lower() + ".demo.ts.net",
+                "addresses": {"host": f"100.64.0.{10 + DEMO_DEFS.index(d)}", "tailscale": d["name"].lower().replace(" ", "-") + ".demo.ts.net",
                               "ports": [8000, 22]},
                 "history": hist,
             })
