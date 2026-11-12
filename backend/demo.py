@@ -4,6 +4,14 @@ never presented as real measurements (every snapshot carries demo=True).
 """
 import math, time, random
 
+# Simulated network context for demo mode (clearly synthetic; documentation-range
+# external IP so no real address is implied). Mirrors frontend/src/demo.ts.
+DEMO_NETWORK = {
+    "type": "tailscale", "name": "demo.ts.net",
+    "internal_ip": "100.64.0.1", "external_ip": "203.0.113.7",
+    "tailscale_ip": "100.64.0.1", "lan_ip": "192.168.1.10",
+}
+
 def _wave(t, period, phase=0.0, lo=0.0, hi=1.0):
     return lo + (hi - lo) * (0.5 + 0.5 * math.sin(2 * math.pi * (t / period) + phase))
 

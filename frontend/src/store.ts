@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Device, Aggregate } from './types'
+import type { Device, Aggregate, NetworkInfo } from './types'
 import { demoFrame } from './demo'
 
 export type Mode = 'demo' | 'live'
@@ -34,6 +34,7 @@ interface State {
   connError: string | null
   devices: Device[]
   aggregate: Aggregate | null
+  network: NetworkInfo | null
   ts: number
   selectedId: string | null
   positions: Positions
@@ -58,7 +59,7 @@ interface State {
   setSound: (v: boolean) => void
   resetCamera: () => void
   shuffleLayout: () => void
-  applyFrame: (devices: Device[], aggregate: Aggregate | null, ts: number, mode: Mode) => void
+  applyFrame: (devices: Device[], aggregate: Aggregate | null, ts: number, mode: Mode, network?: NetworkInfo | null) => void
 }
 
 let demoTimer: ReturnType<typeof setInterval> | null = null
@@ -118,6 +119,7 @@ export const useStore = create<State>((set, get) => ({
   connError: null,
   devices: [],
   aggregate: null,
+  network: null,
   ts: 0,
   selectedId: null,
   positions: JSON.parse(load('occ.positions', '{}')),
@@ -129,9 +131,9 @@ export const useStore = create<State>((set, get) => ({
   sound: load('occ.sound', '1') === '1',
   resetCamNonce: 0,
 
-  applyFrame: (devices, aggregate, ts, mode) => {
+  applyFrame: (devices, aggregate, ts, mode, network) => {
     const positions = defaultPositions(devices, get().positions)
-    set({ devices, aggregate, ts, mode, positions })
+    set({ devices, aggregate, ts, mode, positions, network: network ?? null })
   },
 
   setMode: (m) => {
@@ -144,7 +146,7 @@ export const useStore = create<State>((set, get) => ({
       stopDemo()
       // Entering Live clears the simulated fleet so an unconfigured/unreachable
       // backend shows "no devices configured" instead of stale demo data.
-      set({ mode: 'live', devices: [], aggregate: null, ts: 0, selectedId: null })
+      set({ mode: 'live', devices: [], aggregate: null, network: null, ts: 0, selectedId: null })
       const url = get().backendUrl
       if (url) get().connect(url)
       else set({ conn: 'disconnected', connError: null })
@@ -154,7 +156,7 @@ export const useStore = create<State>((set, get) => ({
   connect: (url, fresh) => {
     stopDemo()
     if (!url) { set({ conn: 'disconnected', connError: null }); return }
-    if (fresh) set({ devices: [], aggregate: null, ts: 0, selectedId: null })
+    if (fresh) set({ devices: [], aggregate: null, network: null, ts: 0, selectedId: null })
     if (ws) { try { ws.close() } catch {} ws = null }
     if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null }
     const clean = url.replace(/\/+$/, '')
@@ -173,7 +175,7 @@ export const useStore = create<State>((set, get) => ({
       try {
         const frame = JSON.parse(ev.data)
         if (frame.type === 'fleet' || frame.devices) {
-          get().applyFrame(frame.devices, frame.aggregate, frame.ts, frame.mode || 'live')
+          get().applyFrame(frame.devices, frame.aggregate, frame.ts, frame.mode || 'live', frame.network)
         }
       } catch {}
     }
@@ -231,7 +233,7 @@ function startDemo(set: any, get: any) {
   stopDemo()
   const tick = () => {
     const f = demoFrame()
-    get().applyFrame(f.devices, f.aggregate, f.ts, 'demo')
+    get().applyFrame(f.devices, f.aggregate, f.ts, 'demo', f.network)
   }
   tick()
   demoTimer = setInterval(tick, 2500)

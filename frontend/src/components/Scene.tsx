@@ -1,6 +1,6 @@
 import React, { useRef, useState, useMemo, useCallback, useEffect } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { OrbitControls, Grid, Line, Stars } from '@react-three/drei'
+import { OrbitControls, Grid, Line, Stars, Html } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import { useStore } from '../store'
@@ -11,6 +11,7 @@ import { DeviceHUD } from './DeviceHUD'
 
 function Core() {
   const theme = themeById(useStore(s => s.viz.theme))
+  const network = useStore(s => s.network)
   const ref = useRef<THREE.Mesh>(null)
   const ring = useRef<THREE.Mesh>(null)
   useFrame(({ clock }) => {
@@ -20,6 +21,11 @@ function Core() {
     }
     if (ring.current) ring.current.rotation.z = -clock.elapsedTime * 0.6
   })
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
+  const hasNet = !!network
+  const isTs = network?.type === 'tailscale'
+  const typeLabel = !hasNet ? 'LINKING' : isTs ? 'TAILSCALE' : network?.type === 'internal' ? 'INTERNAL LAN' : 'NETWORK'
+  const ip = (v: string | null | undefined) => (hasNet ? (v || 'N/A') : '…')
   return (
     <group position={[0, 1.6, 0]}>
       <mesh ref={ref}>
@@ -35,6 +41,20 @@ function Core() {
         <meshBasicMaterial color={theme.accent} transparent opacity={0.7} />
       </mesh>
       <pointLight color={theme.accent} intensity={8} distance={20} />
+      <Html position={[0, 2.1, 0]} center distanceFactor={isMobile ? undefined : 12} zIndexRange={[8, 0]}>
+        <div className={`net-core ${isTs ? 'net-ts' : 'net-lan'}`} style={{ '--net-color': theme.accent } as React.CSSProperties}>
+          <div className="net-head">
+            <span className="net-ico">{isTs ? '⬡' : '⌗'}</span>
+            <span className="net-title">NETWORK CORE</span>
+            <span className="net-type">{typeLabel}</span>
+          </div>
+          {hasNet && network?.name && <div className="net-name">{network.name}</div>}
+          <div className="net-ips">
+            <div className="net-ip"><span className="net-ip-k">INTERNAL</span><span className="net-ip-v">{ip(network?.internal_ip)}</span></div>
+            <div className="net-ip"><span className="net-ip-k">EXTERNAL</span><span className="net-ip-v">{ip(network?.external_ip)}</span></div>
+          </div>
+        </div>
+      </Html>
     </group>
   )
 }

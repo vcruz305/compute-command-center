@@ -2,7 +2,7 @@ import React from 'react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { useStore } from '../store'
 import type { Device } from '../types'
-import { fmt, fmtInt, fmtBytesMB, fmtRate, fmtUptime } from '../types'
+import { fmt, fmtBytesMB, fmtInt, fmtRate, fmtUptime, apiEndpoint } from '../types'
 import { KIND_COLOR } from './DeviceModel'
 
 const ENGINE_LABEL: Record<string, string> = {
@@ -92,7 +92,7 @@ export function DevicePanel() {
             <section className="dp-section" key={i}>
               <h4>Inference · {ENGINE_LABEL[inf.engine] || inf.engine}</h4>
               <Row k="Model" v={inf.models.join(', ') || '—'} accent={color} />
-              <Row k="Endpoint" v={`:${inf.port}`} />
+              <Row k="API Endpoint" v={apiEndpoint(device, inf) || 'N/A'} />
               <Row k="Context" v={fmtInt(inf.max_context, ' tok')} />
               <div className="dp-tps-note">per-request vs aggregate</div>
               <Row k="Decode / request" v={fmt(m.decode_tps_per_request, ' tok/s')} accent="#fbbf24" />

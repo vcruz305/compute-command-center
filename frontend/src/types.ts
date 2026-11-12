@@ -101,6 +101,16 @@ export interface FleetFrame {
   mode: 'live' | 'demo'
   devices: Device[]
   aggregate: Aggregate
+  network?: NetworkInfo | null
+}
+
+export interface NetworkInfo {
+  type: 'tailscale' | 'internal' | 'unknown'
+  name: string | null
+  internal_ip: string | null
+  external_ip: string | null
+  tailscale_ip: string | null
+  lan_ip: string | null
 }
 
 export interface TailnetNode {
@@ -135,4 +145,13 @@ export const fmtUptime = (s: number | null | undefined): string => {
   if (!s) return 'N/A'
   const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60)
   return d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m}m` : `${m}m`
+}
+
+// The OpenAI-compatible API endpoint of a running engine, built from the
+// device's reachable host + the engine port. Null when either is unknown.
+export const apiEndpoint = (d: Device, inf: InferenceEngine | null | undefined): string | null => {
+  if (!inf || !inf.port) return null
+  const host = d.addresses?.host || d.addresses?.tailscale
+  if (!host) return null
+  return `http://${host}:${inf.port}/v1`
 }

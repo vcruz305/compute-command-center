@@ -9,14 +9,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 
-import store, tailscale
+import store, tailscale, network
 from collectors import CollectorPool
-from demo import DemoFleet
+from demo import DemoFleet, DEMO_NETWORK
 
 INTERVAL = 3.0            # seconds between collections (2-5s requirement)
 pool = CollectorPool()
 demo = DemoFleet()
-STATE = {"mode": "live", "fleet": {"devices": [], "aggregate": {}}, "ts": 0}
+STATE = {"mode": "live", "fleet": {"devices": [], "aggregate": {}, "network": None}, "ts": 0, "network": None}
 clients = set()
 
 def aggregate(devices):
@@ -53,12 +53,23 @@ async def collect_loop():
                 pool.sync(configs)
                 devices = await pool.collect_all()
             STATE["fleet"] = {"devices": devices, "aggregate": aggregate(devices),
-                              "mode": STATE["mode"]}
+                              "mode": STATE["mode"],
+                              "network": DEMO_NETWORK if STATE["mode"] == "demo" else STATE.get("network")}
             STATE["ts"] = time.time()
             await broadcast()
         except Exception as e:
             STATE["last_error"] = str(e)[:200]
         await asyncio.sleep(INTERVAL)
+
+async def network_loop():
+    # Refresh the core network context (type + internal/external IPs) on a slow
+    # loop; the per-frame broadcast just reads the cached result.
+    while True:
+        try:
+            STATE["network"] = await network.detect()
+        except Exception:
+            pass
+        await asyncio.sleep(45)
 
 async def broadcast():
     if not clients:
@@ -76,8 +87,10 @@ async def broadcast():
 @asynccontextmanager
 async def lifespan(app):
     task = asyncio.create_task(collect_loop())
+    net_task = asyncio.create_task(network_loop())
     yield
     task.cancel()
+    net_task.cancel()
 
 app = FastAPI(title="CONSTELLATION Command Center", lifespan=lifespan)
 # allow_private_network: the GitHub Pages (public) origin reaches this backend

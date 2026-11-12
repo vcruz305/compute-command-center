@@ -101,6 +101,37 @@ button { touch-action: manipulation; }
 .hud-offline-msg { font-size: 10px; color: #f87171; }
 .hud-tail { position: absolute; bottom: -14px; left: 50%; width: 1px; height: 14px; background: var(--hud-color); opacity: .6; }
 
+/* Per-node engine API endpoint */
+.hud-endpoint { display: flex; align-items: center; gap: 4px; margin: 0 0 5px; font-family: var(--mono); min-width: 0; }
+.hud-ep-ico { color: var(--hud-color); font-size: 10px; flex-shrink: 0; line-height: 1; }
+.hud-ep-url { font-size: 9px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---------- Network core (center hub readout) ---------- */
+.net-core {
+  --net-color: var(--cyan);
+  min-width: 196px; padding: 9px 12px 10px; text-align: left;
+  background: linear-gradient(180deg, rgba(4,18,28,.94), rgba(3,10,18,.9));
+  border: 1px solid var(--net-color); border-radius: 6px;
+  box-shadow: 0 0 26px color-mix(in srgb, var(--net-color) 30%, transparent),
+              inset 0 0 16px color-mix(in srgb, var(--net-color) 6%, transparent);
+  font-family: var(--body); position: relative; backdrop-filter: blur(6px);
+}
+.net-core::before {
+  content: ''; position: absolute; top: 0; left: 12px; right: 12px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--net-color), transparent); border-radius: 2px;
+}
+.net-head { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.net-ico { color: var(--net-color); font-size: 13px; text-shadow: 0 0 10px var(--net-color); line-height: 1; }
+.net-title { font-family: var(--disp); font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #fff; white-space: nowrap; }
+.net-type { margin-left: auto; font-family: var(--mono); font-size: 8px; letter-spacing: 1px; padding: 2px 6px; border-radius: 3px; border: 1px solid; white-space: nowrap; }
+.net-ts .net-type { color: #4ade80; border-color: rgba(74,222,128,.5); background: rgba(74,222,128,.08); }
+.net-lan .net-type { color: var(--gold); border-color: rgba(251,191,36,.5); background: rgba(251,191,36,.08); }
+.net-name { font-family: var(--mono); font-size: 10px; color: var(--net-color); letter-spacing: .5px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 230px; }
+.net-ips { display: flex; flex-direction: column; gap: 3px; border-top: 1px dashed color-mix(in srgb, var(--net-color) 22%, transparent); padding-top: 6px; }
+.net-ip { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; }
+.net-ip-k { font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: var(--dim); }
+.net-ip-v { font-family: var(--mono); font-size: 12px; color: var(--text); }
+
 /* ---------- Device panel ---------- */
 .device-panel {
   --hud-color: var(--cyan);
@@ -393,8 +424,16 @@ button { touch-action: manipulation; }
   .hud-compact .hud-sim { margin-left: 4px; }
   .hud-tag-gpu { font-family: var(--mono); font-size: 10px; color: var(--hud-color); margin-left: auto; }
   .hud-compact .hud-tail { bottom: -12px; height: 12px; }
+  .hud-compact .hud-endpoint { margin: 3px 0 0; }
+  .hud-compact .hud-ep-url { font-size: 8px; max-width: 112px; }
   .hud-val { font-size: 10px; }
   .hud-label { font-size: 6px; }
+
+  /* Network core: compact fixed-size readout above the hub */
+  .net-core { min-width: 172px; padding: 7px 10px 8px; }
+  .net-title { font-size: 9px; letter-spacing: 1.5px; }
+  .net-name { font-size: 9px; max-width: 180px; }
+  .net-ip-v { font-size: 11px; }
 
   /* Device panel -> bottom sheet */
   .device-panel {

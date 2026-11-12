@@ -1,7 +1,7 @@
 import React from 'react'
 import { Html } from '@react-three/drei'
 import type { Device } from '../types'
-import { fmt, fmtBytesMB, fmtInt } from '../types'
+import { fmt, fmtBytesMB, fmtInt, apiEndpoint } from '../types'
 import { KIND_COLOR } from './DeviceModel'
 import { blip } from '../audio'
 
@@ -22,6 +22,7 @@ export function DeviceHUD({ device, selected, onSelect, lift = 0 }: {
   // Render a fixed-size name tag instead (full metrics live in the tap-through
   // bottom sheet). `lift` staggers alternate tags so they don't collide.
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
+  const endpoint = apiEndpoint(device, inf)
 
   const head = (
     <div className="hud-head">
@@ -42,24 +43,32 @@ export function DeviceHUD({ device, selected, onSelect, lift = 0 }: {
         {head}
         {offline ? (
           <div className="hud-offline-msg">OFFLINE · {device.last_error || 'unreachable'}</div>
-        ) : isMobile ? null : (
+        ) : (
           <>
-            {inf ? (
+            {!isMobile && (inf ? (
               <div className="hud-model">
                 <span className="hud-engine" style={{ color }}>{ENGINE_LABEL[inf.engine] || inf.engine}</span>
                 <span className="hud-modelname">{inf.models[0] || '—'}</span>
               </div>
             ) : (
               <div className="hud-model"><span className="hud-noengine">no inference server</span></div>
+            ))}
+            {endpoint && (
+              <div className="hud-endpoint" title={endpoint}>
+                <span className="hud-ep-ico">⌁</span>
+                <span className="hud-ep-url">{endpoint}</span>
+              </div>
             )}
-            <div className="hud-grid">
-              <div className="hud-cell"><span className="hud-label">DECODE</span><span className="hud-val">{fmt(m?.decode_tps_per_request, ' t/s')}</span></div>
-              <div className="hud-cell"><span className="hud-label">GPU</span><span className="hud-val">{fmt(gpu?.util_pct, '%', 0)}</span></div>
-              <div className="hud-cell"><span className="hud-label">VRAM</span><span className="hud-val">{fmtBytesMB(gpu?.vram_used_mb)}</span></div>
-              <div className="hud-cell"><span className="hud-label">TEMP</span><span className="hud-val">{fmt(gpu?.temp_c, '°C', 0)}</span></div>
-              <div className="hud-cell"><span className="hud-label">PWR</span><span className="hud-val">{fmt(gpu?.power_w, 'W', 0)}</span></div>
-              <div className="hud-cell"><span className="hud-label">REQ</span><span className="hud-val">{fmtInt(m?.active_requests)}</span></div>
-            </div>
+            {!isMobile && (
+              <div className="hud-grid">
+                <div className="hud-cell"><span className="hud-label">DECODE</span><span className="hud-val">{fmt(m?.decode_tps_per_request, ' t/s')}</span></div>
+                <div className="hud-cell"><span className="hud-label">GPU</span><span className="hud-val">{fmt(gpu?.util_pct, '%', 0)}</span></div>
+                <div className="hud-cell"><span className="hud-label">VRAM</span><span className="hud-val">{fmtBytesMB(gpu?.vram_used_mb)}</span></div>
+                <div className="hud-cell"><span className="hud-label">TEMP</span><span className="hud-val">{fmt(gpu?.temp_c, '°C', 0)}</span></div>
+                <div className="hud-cell"><span className="hud-label">PWR</span><span className="hud-val">{fmt(gpu?.power_w, 'W', 0)}</span></div>
+                <div className="hud-cell"><span className="hud-label">REQ</span><span className="hud-val">{fmtInt(m?.active_requests)}</span></div>
+              </div>
+            )}
           </>
         )}
         <div className="hud-tail" />

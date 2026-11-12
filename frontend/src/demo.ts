@@ -21,6 +21,14 @@ const DEFS: Def[] = [
 
 const history: Record<string, Device['history']> = {}
 
+// Simulated network context for the demo core (clearly synthetic; documentation-
+// range external IP so no real address is implied). Mirrors backend/demo.py.
+const DEMO_NETWORK = {
+  type: 'tailscale' as const, name: 'demo.ts.net',
+  internal_ip: '100.64.0.1', external_ip: '203.0.113.7',
+  tailscale_ip: '100.64.0.1', lan_ip: '192.168.1.10',
+}
+
 export function demoFrame(): FleetFrame {
   const t = Date.now() / 1000
   const devices: Device[] = DEFS.map((d, idx) => {
@@ -54,7 +62,7 @@ export function demoFrame(): FleetFrame {
       history: hist,
     }
   })
-  return { ts: t, mode: 'demo', devices, aggregate: aggregate(devices) }
+  return { ts: t, mode: 'demo', devices, aggregate: aggregate(devices), network: DEMO_NETWORK }
 }
 
 export function aggregate(devices: Device[]): Aggregate {
