@@ -20,7 +20,7 @@ export function FleetBar() {
   const sound = useStore(s => s.sound)
   const setSound = useStore(s => s.setSound)
   const a = aggregate
-  const isDemo = mode === 'demo' || devices.every(d => d.demo)
+  const isDemo = mode === 'demo' || (devices.length > 0 && devices.every(d => d.demo))
   return (
     <header className="fleetbar">
       <div className="fleet-brand">
