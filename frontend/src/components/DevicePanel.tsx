@@ -14,8 +14,8 @@ const KIND_LABEL: Record<string, string> = {
   'gpu-server': 'GPU Server', generic: 'Compute Node',
 }
 
-function Row({ k, v, accent }: { k: string; v: string; accent?: string }) {
-  return <div className="dp-row"><span className="dp-k">{k}</span><span className="dp-v" style={accent ? { color: accent } : undefined}>{v}</span></div>
+function Row({ k, v, accent, wrap }: { k: string; v: string; accent?: string; wrap?: boolean }) {
+  return <div className={`dp-row ${wrap ? 'dp-wrap' : ''}`}><span className="dp-k">{k}</span><span className="dp-v" title={wrap ? v : undefined} style={accent ? { color: accent } : undefined}>{v}</span></div>
 }
 
 function Chart({ data, dataKey, color, unit }: { data: any[]; dataKey: string; color: string; unit: string }) {
@@ -92,7 +92,7 @@ export function DevicePanel() {
             <section className="dp-section" key={i}>
               <h4>Inference · {ENGINE_LABEL[inf.engine] || inf.engine}</h4>
               <Row k="Model" v={inf.models.join(', ') || '—'} accent={color} />
-              <Row k="API Endpoint" v={apiEndpoint(device, inf) || 'N/A'} />
+              <Row k="API Endpoint" v={apiEndpoint(device, inf) || 'N/A'} wrap />
               <Row k="Context" v={fmtInt(inf.max_context, ' tok')} />
               <div className="dp-tps-note">per-request vs aggregate</div>
               <Row k="Decode / request" v={fmt(m.decode_tps_per_request, ' tok/s')} accent="#fbbf24" />
