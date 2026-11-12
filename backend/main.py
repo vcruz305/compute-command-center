@@ -80,7 +80,15 @@ async def lifespan(app):
     task.cancel()
 
 app = FastAPI(title="ORBITAL Command Center", lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+# allow_private_network: the GitHub Pages (public) origin reaches this backend
+# over a private tailnet IP; Chrome's Private Network Access requires opt-in.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://vcruz305.github.io"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_private_network=True,
+)
 
 @app.get("/api/health")
 def health():
