@@ -1,0 +1,16 @@
+# deps / build
+node_modules/
+frontend/dist/
+frontend/.vite/
+# backend runtime
+backend/.venv/
+backend/devices.json
+backend/__pycache__/
+backend/*.log
+__pycache__/
+*.pyc
+# misc
+*.log
+.DS_Store
+*.crt
+*.key
