@@ -24,7 +24,7 @@ export function ConnectModal() {
   return (
     <div className="modal-backdrop" onClick={() => setShow(false)}>
       <div className="modal" onClick={e => e.stopPropagation()}>
-        <h3>Connect Telemetry Backend</h3>
+        <div className="modal-head"><h3>Connect Telemetry Backend</h3><button className="dp-close" onClick={() => setShow(false)} aria-label="Close">✕</button></div>
         <p className="modal-note">The 3D frontend is static. Real metrics stream from a small FastAPI backend that collects them over SSH and broadcasts them over WebSocket. To go live:</p>
         <ol className="modal-steps">
           <li><b>Run the backend</b> on a machine that can SSH into your devices (<code>backend/run.sh</code>).</li>
